@@ -1,0 +1,193 @@
+@charset "UTF-8";
+/* CSS Document */
+
+* {
+	margin:0px;
+	padding:0px;
+	color:black;
+	font-family: sans-serif, "Palatino Linotype", Times, Times New Roman, serif;
+}
+body, html {
+	width: 100%; 
+	height: 100%;
+	margin:0px 0px;
+	font-weight:200;
+	overflow-y:scroll;
+}
+
+.faded {
+	color:#3F3F3F;
+}
+.white-border { /* to prevent selection shifting */
+	border:2px solid white;
+}
+.boxed {
+	border:2px solid black !important;
+	/*border-radius:2px;*/
+}
+
+
+
+#pathHeader {
+	top:0;
+	background-color:#dddddd;
+	color:#3F3F3F;
+	height:2em;
+	padding-left:210px;
+	line-height:2em;
+	font-size:1em;
+}
+#pathHeader img {
+	float:right;
+	margin-right:30px;
+	width:1.5em;
+	height:1.5em;
+	margin-top:.25em;
+}
+
+#wrapper {
+	width:850px;
+	height:85vh; /* height depends on screen size */
+	margin-left:200px;
+	margin-top:1em;
+}
+
+.hide {
+	display: none;
+}
+
+.left-float {
+	float:left;
+}
+
+/*   left nav   */
+.nav-buttons {
+	float:left;
+	top:0px;
+	margin-left:50px;
+	
+	width:120px;
+	margin-top:1em;
+	border: 2px solid white;
+
+}
+
+
+.btn-block {
+	border: 2px solid white; 
+}
+
+.btn-block + .btn-block { /* two in a row */
+  margin-top: 10px;
+}
+
+
+
+
+
+.sender{
+	height:100%;
+	text-align: left;
+	width:8em;
+	
+	max-height:50px;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+.subject{
+	height:100%;
+	text-align: left;
+	width:70%;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+.message {
+	height:100%;
+	text-align: left;
+	max-width:700px;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+
+	font-weight:normal;
+	font-size:.9em;
+}
+
+.timestamp {
+	height:100%;
+	text-align: right;
+	width:6em;
+
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+
+	font-weight:normal;
+	font-size:.9em;
+}
+
+/* arrows! */
+.arrows { /* wrapper */
+	display:block;
+	clear:both;
+	width:54px;
+	margin-top: 10px;
+	margin-left:auto;
+	margin-right:auto;
+	border:2px solid white;
+		
+}
+.arrow img {
+	width:45px;
+}
+.arrow {
+	display:block;
+	height:100%;
+	width:50px;
+	margin:0 auto;
+	/*float:left;*/
+	border:2px solid white;
+}
+
+
+
+
+/* override bootstrap to have reg. font size */
+.label {
+	font-size:.9em !important;
+	font-weight: inherit !important;
+}
+.btn {
+	font-size:inherit !important;
+	font-weight: inherit !important;
+}
+
+
+
+
+/* MAKING THE SCROLLBAR VISIBLE ALWAYS */
+
+.scrollableText::-webkit-scrollbar {
+    -webkit-appearance: none;
+}
+
+.scrollableText::-webkit-scrollbar:vertical {
+    width: 11px;
+}
+
+.scrollableText::-webkit-scrollbar:horizontal {
+    height: 11px;
+}
+
+.scrollableText::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 2px solid white;
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.scrollableText::-webkit-scrollbar-track { 
+    background-color: #fff; 
+    border-radius: 8px; 
+}

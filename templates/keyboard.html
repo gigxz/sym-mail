@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Online Keyboard</title>
+    <link rel="stylesheet" type="text/css" href="../style/keyboardCSS.css" />
+    <link rel="stylesheet" href="../style/main_style.css" type="text/css"/>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="../js/keyboard.js"></script>
+</head>
+<body>
+ 
+<div id="container">
+    <textarea id="write" rows="6" cols="60"></textarea>
+    <ul id="key">
+        <div id = "key1" class = "white-border">
+            <div id = "key1key1" class = "white-border">
+                <div id = "key1key1key1">
+                    <li class="symbol"><span class="off">`</span><span class="on">~</span></li>
+                </div>
+                <div id = "key1key1key2">
+                <li class="symbol"><span class="off">1</span><span class="on">!</span></li>
+                </div>
+                <div id = "key1key1key3">
+                <li class="symbol"><span class="off">2</span><span class="on">@</span></li>
+                </div>
+                <div id = "key1key1key4">
+                <li class="symbol"><span class="off">3</span><span class="on">#</span></li>
+                </div>
+                <div id = "key1key1key5">
+                <li class="symbol" ><span class="off">4</span><span class="on">$</span></li>
+                </div>
+                <div id = "key1key1key6">
+                <li class="symbol" ><span class="off">5</span><span class="on">%</span></li> 
+                </div>
+                <div id = "key1key1key7">
+                <li class="symbol"><span class="off">6</span><span class="on">^</span></li>
+                </div>
+            </div>
+            <div id = "key1key2" class = "white-border">
+                <div id = "key1key2key1">
+                    <li class="symbol" id = "key1key2key1"><span class="off">7</span><span class="on">&amp;</span></li>
+                </div>
+                <div id = "key1key2key2">
+                    <li class="symbol" id = "key1key2key2"><span class="off">8</span><span class="on">*</span></li>
+                </div>
+                <div id = "key1key2key3">
+                    <li class="symbol" id = "key1key2key3"><span class="off">9</span><span class="on">(</span></li>
+                </div>
+                <div id = "key1key2key4">
+                    <li class="symbol" id = "key1key2key4"><span class="off">0</span><span class="on">)</span></li>
+                </div>
+                <div id = "key1key2key5">
+                    <li class="symbol" id = "key1key2key5"><span class="off">-</span><span class="on">_</span></li>
+                </div>
+                <div id = "key1key2key6">
+                    <li class="symbol" id = "key1key2key6"><span class="off">=</span><span class="on">+</span></li>
+                </div>
+                <div id = "key1key2key7">
+                    <li class="delete lastitem" id = "key1key2key">delete</li>
+                </div>
+            </div>
+        </div>
+        <div id = "key2" class = "white-border">
+            <div id = "key2key1" class = "white-border">
+                <div id = "key2key1key1">
+                    <li class="tab">tab</li>
+                </div>
+                <div id = "key2key1key2">
+                    <li class="letter">q</li>
+                </div>
+                <div id = "key2key1key3">
+                    <li class="letter">w</li>
+                </div>
+                <div id = "key2key1key4">
+                    <li class="letter">e</li>
+                </div>
+                <div id = "key2key1key5">
+                    <li class="letter">r</li>
+                </div>
+                <div id = "key2key1key6">
+                    <li class="letter">t</li>
+                </div>
+                <div id = "key2key1key7">
+                    <li class="letter">y</li>
+                </div>
+            </div>
+            <div id = "key2key2" class = "white-border">
+                <div id = "key2key2key1">
+                    <li class="letter">u</li>
+                </div>
+                <div id = "key2key2key2">
+                    <li class="letter">i</li>
+                </div>
+                <div id = "key2key2key3">
+                    <li class="letter">o</li>
+                    </div>
+                <div id = "key2key2key4"> 
+                    <li class="letter">p</li>
+                </div>
+                <div id = "key2key2key5">
+                    <li class="symbol"><span class="off">[</span><span class="on">{</span></li>
+                </div>
+                <div id = "key2key2key6">
+                    <li class="symbol"><span class="off">]</span><span class="on">}</span></li>
+                </div>
+                <div id = "key2key2key7">
+                    <li class="symbol lastitem"><span class="off">\</span><span class="on">|</span></li>
+                </div>
+            </div>
+        </div>
+        <div id = "key3" class = "white-border">
+            <div id = "key3key1" class = "white-border">
+                <div id = "key3key1key1">
+                <li class="capslock">caps</li>
+                </div>
+                <div id = "key3key1key2">
+                <li class="letter">a</li>
+                </div>
+                <div id = "key3key1key3">
+                <li class="letter">s</li>
+                </div>
+                <div id = "key3key1key4">
+                <li class="letter">d</li>
+                </div>
+                <div id = "key3key1key5">
+                <li class="letter">f</li>
+                </div>
+                <div id = "key3key1key6">
+                <li class="letter">g</li>
+                </div>
+                <div id = "key3key1key7">
+                <li class="letter">h</li>
+                </div>
+            </div>
+            <div id = "key3key2" class = "white-border">
+                <div id = "key3key2key1">
+                <li class="letter">j</li>
+                </div>
+                <div id = "key3key2key2">
+                <li class="letter">k</li>
+                </div>
+                <div id = "key3key2key3">
+                <li class="letter">l</li>
+                </div>
+                <div id = "key3key2key4">
+                <li class="symbol"><span class="off">;</span><span class="on">:</span></li>
+                </div>
+                <div id = "key3key2key5">
+                <li class="symbol"><span class="off">'</span><span class="on">&quot;</span></li>
+                </div>
+                <div id = "key3key2key6">
+                <li class="return">return</li>
+                </div>
+            </div>
+        </div>
+        <div id = "key4" class = "white-border">
+            <div id = "key4key1" class = "white-border">
+                <div id = "key4key1key1">
+                <li class="left-shift">shift</li>
+                </div>
+                <div id = "key4key1key2">
+                <li class="letter">z</li>
+                </div>
+                <div id = "key4key1key3">
+                <li class="letter">x</li>
+                </div>
+                <div id = "key4key1key4">
+                <li class="letter">c</li>
+                </div>
+                <div id = "key4key1key5">
+                <li class="letter">v</li>
+                </div>
+                <div id = "key4key1key6">
+                <li class="letter">b</li>
+                </div>
+                <div id = "key4key1key7">
+                <li class="letter">n</li>
+                </div>
+            </div>
+            <div id = "key4key2" class = "white-border">
+                <div id = "key4key2key1">
+                <li class="letter">m</li>
+                </div>
+                <div id = "key4key2key2">
+                <li class="symbol"><span class="off">,</span><span class="on">&lt;</span></li>
+                </div>
+                <div id = "key4key2key3">
+                <li class="symbol"><span class="off">.</span><span class="on">&gt;</span></li>
+                </div>
+                <div id = "key4key2key4">
+                <li class="symbol"><span class="off">/</span><span class="on">?</span></li>
+                </div>
+                <div id = "key4key2key5">
+                <li class="right-shift lastitem">shift</li>
+                </div>
+            </div>
+        </div>
+        <div id = "key5" class = "white-border">
+            <li class="space">Space</li>
+        </div>
+        <div id ="goBack" class = "white-border">
+            <li class="back lastitem">back</li>
+        </div>
+    </ul>
+</div>
+ 
+</body>
+</html>

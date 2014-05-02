@@ -1,0 +1,37 @@
+body, html {
+	/* caregiver pg, small font size */
+	font-size:14px !important;
+}
+#settings {
+	float: left;
+	display: block;
+	margin-top:35px;
+	height: 490px;
+	width: 680px;
+	margin-left: 210px;
+	border: 2px solid white;
+}
+
+#plus {
+	height:100%;
+	width:50%;
+
+	float:left;
+
+	font-size:30px;
+	border:2px solid white;
+	text-align: center;
+}
+
+.white {
+	color: white;
+}
+
+.left-col {
+	width:8em;
+}
+
+input[type="range"] {
+	display: float left;
+	width: 170px;
+}

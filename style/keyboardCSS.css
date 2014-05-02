@@ -1,0 +1,98 @@
+* {
+margin: 0;
+padding: 0;
+}
+
+body {
+font: 50%/1.5 Verdana, Sans-Serif;
+background: #eee;
+}
+
+#container {
+margin: 100px auto;
+width: 738px;
+}
+
+#write {
+margin: 0 0 5px;
+padding: 5px;
+width: 671px;
+height: 200px;
+font: 1em/1.5 Verdana, Sans-Serif;
+background: #fff;
+border: .1em solid #f9f9f9;
+-moz-border-radius: 5px;
+-webkit-border-radius: 5px;
+}
+
+#key {
+margin: 0;
+padding: 0;
+height: 1.8em;
+list-style: none;
+}
+
+#key li {
+float: left; 
+margin: 0 auto;
+width: 2em;
+line-height: 2em;
+text-align: center;
+background: #fff;
+border: .1em solid #f9f9f9;
+-moz-border-radius: .15em;
+-webkit-border-radius: .15em;
+}
+
+.capslock, .tab, .left-shift {
+    font: 50%/1.5;
+    width: 2.5em;
+}
+    #key .tab, #key .delete {
+    width: 2.5em;
+}
+    #key .capslock {
+    width: 3.4em;
+}
+    #key .return {
+    width: 3.3em;
+}
+    #key .left-shift {
+    width: 4.45em;
+}
+    #key .right-shift {
+    width: 4.45em;
+}
+.lastitem {
+    margin-right: 0;
+}
+.uppercase {
+    text-transform: uppercase;
+}
+#key .space, #goBack .back{
+    float: left;
+    width: 17em;
+}
+.on {
+    display: none;
+}
+
+#key1, #key2, #key3, #key4 {
+    height: 2.3em; 
+    width: 31.5em;
+    margin: 0 2em 2em 0;
+    border: .1em solid #eee;
+
+}
+
+#key1key2, #key2key2, #key3key2, #key4key2 {
+    margin-top: -.25em;
+}
+
+#goBack, #key5 {
+    height: 2.2em; 
+    width: 17.2em;
+    border: .1em solid #eee;
+}
+
+
