@@ -231,7 +231,7 @@ app.get('/getemail/:uid', function(request, response) {
       // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
       					from: mail_object.from[0].name,
       					subject: mail_object.subject,
-      					to: mail_object.to[0].address, //TODO GET ENTIRE LIST NOT JUST FIRST
+      					to: mail_object.to, // a list of 'to' objects (name and address)
       					date: mail_object.date,
       					body: mail_object.html
       				});
