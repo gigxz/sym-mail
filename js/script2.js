@@ -14,9 +14,27 @@ window.addEventListener('load', function(){
 
     addTransitions();
     intervalFunction = setInterval(cycle, waitTime);
-    typing(); 
+    clickHandler(); 
 
 }); 
+
+function cyclingOn(num) {
+    if(num===1) {
+        // turn on
+        console.log("TURNING CYCLING ON");
+        groupNumber = 0;
+        id = 'group';
+        waitTime = 1000;
+        intervalFunction = setInterval(cycle, waitTime);
+        clickHandler(); 
+    }
+    else if(num===0) {
+        //turn off
+        clearInterval(intervalFunction);
+    }
+}
+
+
 function addTransitions() {
     // for everything starting with 'group'
     $("[id^='group']").each(function(index, obj) {
@@ -46,7 +64,7 @@ function setCycleTime(val) {
 	waitTime = val*1000;
 }
 
-var typing = function() {
+var clickHandler = function() {
         // prevent default behavior
         // (i.e. page scrolling down when you press space)
         $(document).keydown(function(e) {
@@ -67,20 +85,14 @@ var typing = function() {
                     if (id.length < 2) {
                         window.history.back();
                     }
-                    if ( $( "#keyboard").is(":visible") ){
-                        $( '#keyboard').slideUp();
-                    }
-
-
-                } else {
-
-                    if ( document.getElementById(id+groupNumber).className === 'requiresKeyboard boxed'){
-                            expandKeyboard();
-                            id = id + groupNumber + 'group'
-                            groupNumber = 0;
+                    intervalFunction = setInterval(cycle, waitTime);
+                }
+                else {
+                    if ($('#'+id+groupNumber).hasClass('requiresKeyboard')){
+                        console.log("CLICKED ITEM REQUIRES KEYBOARD");
+                        expandKeyboard();
                     }
                     else {
-
                         // if one level down exists AND is not hidden
                         var levelDownSelecter = '#'+id + groupNumber + 'group1';
                         if ($(levelDownSelecter).length && !$(levelDownSelecter).hasClass('hide')) {
@@ -88,16 +100,18 @@ var typing = function() {
                             groupNumber = 0;
                         } 
                         else {
-                            // CLICK ON ITEM
-                            console.log("Clicking on: "+id+groupNumber);
+                            //CLICK ON ITEM
+                            //TODO FIX THIS BUG WTF
+                            if(groupNumber===0)
+                                 groupNumber=1;
+                            console.log("SCRIPT2: Clicking on: "+id+groupNumber);
                             document.getElementById(id+groupNumber).click();
-                        }    
+                        } 
+                        intervalFunction = setInterval(cycle, waitTime);   
                     }
                 }
 
-                intervalFunction = setInterval(cycle, waitTime);
-
-                console.log("nxt: "+id+groupNumber);
+                console.log("CLICK IN SCRIPT2: "+id+groupNumber);
            }
         });
 };
@@ -125,20 +139,9 @@ var animate = function(stringGroup){
 	
 };
 
-var elementExists = function() {
-
-    item = document.getElementById(id + groupNumber);
-    if (item) {
-        return true;
-    }
-    else {
-        groupNumber = 0;
-        return false;
-    }
-}
 
 // version that doesn't change groupnumber or use global variables
-var elementExists2 = function(idToCheck) {
+var elementExists = function(idToCheck) {
     item = document.getElementById(idToCheck);
     if (item) {
         return true;
@@ -148,21 +151,6 @@ var elementExists2 = function(idToCheck) {
     }
 }
 
-// number of direct children (group1 -->  group1group1, group1group2)
-// var getGroupChilds = function(idToCheck) {
-//     var count = 0;
-//     var len = idToCheck.length + 6;
-//     var groupChilds = [];
-//     // for everything starting with 'idToCheck'
-//     $("[id^='"+idToCheck+"']").each(function(index, obj) {
-        
-//         if($(this).attr('id').length === len && !$(this).hasClass('hide')) {
-//             //console.log($(this).attr('id') +" is child of "+idToCheck);
-//             groupChilds.push($(this));
-//         }
-//     });
-//     return groupChilds;
-// }
 
 var cycle = function () {
     // the do-while loop skips over elements with class 'hide'
@@ -171,139 +159,32 @@ var cycle = function () {
     do {
         groupNumber = groupNumber + 1; 
         curr = id + groupNumber; // temp element to check
-
-        if(elementExists2(curr)) {
-            stringGroup = String('#'+ curr);
+        if(elementExists(curr)) {
+            stringGroup = '#'+ curr;
         }
         else {
             stringGroup = '#goBack';
             groupNumber = 0; 
             break;
         }
-    } while($('#'+curr).hasClass('hide') || $('#'+curr).hasClass('skip'));
-
+    } while($('#'+curr).hasClass('hide'));
     animate(stringGroup);
-
 }
-
-// var printLetter = function(groupName){
-//     var $write = $('#write'),
-//         shift = false,
-//         capslock = false;
-     
-//         var $this = $(groupName),
-//             character = $this.html(); // If it's a lowercase letter, nothing happens to this variable
-         
-//         // Shift keys
-//         if ($this.hasClass('left-shift') || $this.hasClass('right-shift')) {
-//             $('.letter').toggleClass('uppercase');
-//             $('.symbol span').toggle();
-             
-//             shift = (shift === true) ? false : true;
-//             capslock = false;
-//             return false;
-//         }
-         
-//         // Caps lock
-//         if ($this.hasClass('capslock')) {
-//             $('.letter').toggleClass('uppercase');
-//             capslock = true;
-//             return false;
-//         }
-         
-//         // Delete
-//         if ($this.hasClass('delete')) {
-//             var html = $write.html();
-             
-//             $write.html(html.substr(0, html.length - 1));
-//             return false;
-//         }
-         
-//         // Special characters
-//         if ($this.hasClass('symbol')) character = $('span:visible', $this).html();
-//         if ($this.hasClass('space')) character = ' ';
-//         if ($this.hasClass('tab')) character = "\t";
-//         if ($this.hasClass('return')) character = "\n";
-         
-//         // Uppercase letter
-//         if ($this.hasClass('uppercase')) character = character.toUpperCase();
-         
-//         // Remove shift once a key is clicked.
-//         if (shift === true) {
-//             $('.symbol span').toggle();
-//             if (capslock === false) $('.letter').toggleClass('uppercase');
-             
-//             shift = false;
-//         }
-         
-//         // Add the character
-//         $write.html($write.html() + character);
-// };
-
-
-var running = $(function(){
-    var $write = $('#write'),
-        shift = false,
-        capslock = false;
-     
-    $('#keyboard li').click(function(){
-        var $this = $(this),
-            character = $this.html(); // If it's a lowercase letter, nothing happens to this variable
-         
-        // Shift keys
-        if ($this.hasClass('left-shift') || $this.hasClass('right-shift')) {
-            $('.letter').toggleClass('uppercase');
-            $('.symbol span').toggle();
-             
-            shift = (shift === true) ? false : true;
-            capslock = false;
-            return false;
-        }
-         
-        // Caps lock
-        if ($this.hasClass('capslock')) {
-            $('.letter').toggleClass('uppercase');
-            capslock = true;
-            return false;
-        }
-         
-        // Delete
-        if ($this.hasClass('delete')) {
-            var html = $write.html();
-             
-            $write.html(html.substr(0, html.length - 1));
-            return false;
-        }
-         
-        // Special characters
-        if ($this.hasClass('symbol')) character = $('span:visible', $this).html();
-        if ($this.hasClass('space')) character = ' ';
-        if ($this.hasClass('tab')) character = "\t";
-        if ($this.hasClass('return')) character = "\n";
-         
-        // Uppercase letter
-        if ($this.hasClass('uppercase')) character = character.toUpperCase();
-         
-        // Remove shift once a key is clicked.
-        if (shift === true) {
-            $('.symbol span').toggle();
-            if (capslock === false) $('.letter').toggleClass('uppercase');
-             
-            shift = false;
-        }
-         
-        // Add the character
-        $write.html($write.html() + character);
-    });
-});
 
 
 function expandKeyboard(){
-    if ($("#keyboard").is(":hidden") ){
-        $('#keyboard' ).show("slow"); 
+    if ($('#keyboardFrame').hasClass("hide") ){
+        console.log("SHOWING KEYBOARD");
+        cyclingOn(0); // TURN OFF CYCLING
+        $('#keyboardFrame').removeClass("hide");
+        document.getElementById("keyboardFrame").contentWindow.focus();
+        document.getElementById("keyboardFrame").contentWindow.restartKeyboard();
     }
-    else {
-        $('#keyboard').slideUp();
+}
+function hideKeyboard() {
+    if ( ! $('#keyboardFrame').hasClass("hide")){
+        $('#keyboardFrame').addClass("hide");
+        cyclingOn(1); // TURN ON CYCLING
     }
 }
 
@@ -312,7 +193,6 @@ function expandToSelection(){
     // remove hide from all descendants
     $('#recipientBoxRow').find('.hide').removeClass('hide');
 
-    //TODO comment back in
     $('.seePrevRecip').addClass('hide'); //no prevs to start with
     // set id to id of seePrevRecip
     var newID = $('.seePrevRecip').attr('id');
@@ -371,8 +251,8 @@ function make_request(url, callback) {
 }
 
 function meta(name) {
-    	var tag = document.querySelector('meta[name=' + name + ']');
-    	if (tag != null)
-        	return tag.content;
-    	return '';
+    var tag = document.querySelector('meta[name=' + name + ']');
+    if (tag != null)
+        return tag.content;
+    return '';
 }

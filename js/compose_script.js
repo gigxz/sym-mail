@@ -2,7 +2,6 @@ var recipients = [];
 
 /* ON LOAD */
 window.onload = function() {
-
 	if(meta('uid')!='') {
 		get_reply_data(function(subjText) {
 			if(subjText) {
@@ -46,15 +45,9 @@ function get_reply_data(callback) {
             $("#from").html();
             $('#to').html(data[0].from);
             $("#subjectText").html("Re: " + data[0].subject);
-           // get plain text, put in box	
-           $("#write").html(data[0].text);
+           //TODO get plain text, put in box	
+           //$("#write").html(data[0].text);
 
-//          data[0].from
-//              for (var num = 6; num > 0; num--) {
-//                  var from = data[num].from;              
-//              var div = document.createElement('div');
-//              div.uid = data[num].uid;
-//              }
 			callback(data[0].subject);
         } else {
             alert("Feed Request was invalid.");
@@ -68,14 +61,6 @@ $(window).bind('resize', function() {
     showHideScrollArrows();
 });
 
-
-// function make_request(url, method, params, callback) {
-//     request = new XMLHttpRequest();
-//     request.open(method, url, true);
-//     request.addEventListener('load', callback, false);  
-// 	request.send(params);
-// 	return request;
-// }
 
 function submitEmail() {
 	var mainform = document.getElementById('mainform');
