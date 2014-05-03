@@ -470,6 +470,10 @@ app.get('/settings', function(request, response) {
 	response.render('settings.html');
 });
 
+app.get('/keyboard', function(request, response) {
+  response.render('keyboard.html');
+});
+
 app.get('/home', function(request, response) {
 	response.render('home.html');
 });

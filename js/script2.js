@@ -99,7 +99,7 @@ var typing = function() {
 
                 console.log("nxt: "+id+groupNumber);
            }
-        })
+        });
 };
 
 var animate = function(stringGroup){
