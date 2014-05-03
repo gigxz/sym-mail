@@ -10,28 +10,11 @@ body, html {
     padding:0;
 }
 
-/*#write {
-    width: 671px;
-    height: 200px;
-
-    display:block;
-    margin: 20px auto;
-    padding: 5px;
-
-    font: 1em/1.5 Verdana, Sans-Serif;
-    background: #fff;
-    border: .1em solid #f9f9f9;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-}*/
-
 #keyboard-container {
     padding:10px;
     width:40em;
     height:13em;
-    background-color: #E6E6E6;
-/*    border:1px solid #aeaeae;
-    border-radius:8px;*/
+    background-color: #E6E6E6;/
 }
 
 /* big group */
@@ -69,7 +52,7 @@ body, html {
 }
 .capslock, .tab, .left-shift {
     font: 50%/1.5;
-    width: 2.5em;
+    width: 3em;
 }
 
 .leftCol {
