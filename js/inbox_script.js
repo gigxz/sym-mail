@@ -32,7 +32,7 @@ function scrollDown() {
 
 
 function readEmail(inboxmsg) {
-    window.location.href = 'http://localhost:8080/email/' + $(inboxmsg).attr('uid');
+    window.location.href = 'http://localhost:8080/email/' + $(inboxmsg).attr('uid') + '/' + meta('boxname');
 }
 
 
@@ -84,7 +84,6 @@ function getFormattedDate(timestamp) {
     offset = offset/60;
     email.addHours(-offset); 
 
-    console.log("EMAIL RECEIVED AT "+email);
     // if same date, displace time isntead
     var today = new Date();
     if(today.getDate() === email.getDate() && 

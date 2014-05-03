@@ -143,29 +143,30 @@ app.get('/mailboxes', function(request, response) {
 
 //	IMAP CALL TO OPEN MAILBOXE
 function openEmailBox(box, cb) {
-  imap.openBox(box, true, cb);
+  imap.openBox(box, false, cb);
 }
 
-app.get('/email/:uid', function(request, response) {
+app.get('/email/:uid/:boxname', function(request, response) {
 	var uid = request.params.uid;
-	response.render('read_email.html', {uid: uid});
+  var boxname = request.params.boxname;
+	response.render('read_email.html', [{uid: uid}, {boxname: boxname}]);
 });
 
 
-app.get('/getemail/:uid', function(request, response) {
+app.get('/getemail/:boxname/:uid', function(request, response) {
   imap = new Imap({
     user: 'speakyourmail@gmail.com',
     password: 'testPassword',  host: 'imap.gmail.com',
     port: 993,
     tls: true
   });
-
+  boxname = request.params.boxname
   uid = request.params.uid;
   text='';
   messages = [];
   //var num = 1;
   imap.once('ready', function() {
-    openEmailBox('INBOX', function(err, box) {
+    openEmailBox(boxname, function(err, box) {
       if (err) throw err;
       
       imap.search([uid], function(err, results) {
@@ -400,7 +401,7 @@ app.get('/getemails/:boxname', function(request, response) {
   imap.connect();
 });
 
-app.get('/delete/:uid', function(request, response) {
+app.get('/delete/:boxname/:uid', function(request, response) {
 
   imap = new Imap({
     user: 'speakyourmail@gmail.com',
@@ -410,34 +411,55 @@ app.get('/delete/:uid', function(request, response) {
   });
 
   uid = request.params.uid;
+  boxname = request.params.boxname;
   imap.once('ready', function() {
     // open up all of the inboxes
-    openEmailBox('INBOX', function(err, box) {
+    openEmailBox(boxname, function(err, box) {
       if (err) throw err;
-      console.log(uid);
       // find the uid of the file
+      console.log("searching");
       imap.search([uid], function(err, results) {
         if (err) throw err;
-        var f = imap.fetch(results, {
-          bodies: '',
-          struct: true
-        });
+        console.log("fetching results");
+        var f = imap.fetch(results, { bodies: '1' });
         // move that message to the trash Box
         f.on('message', function(msg, seqno) {
-          move(msg, '[Gmail]/Trash');
+          msg.on('body', function(stream, info){
+            stream.once('end', function(){
+              imap.seq.move(info.seqno, '[Gmail]/Trash', function(err) {
+                if (err) { console.log(err); }
+              }); 
+
+            }); 
+          }); 
+        }); 
+        f.once('error', function(err) {
+          console.log('Fetch error: ' + err);
         });
-      });
-      f.once('error', function(err) {
-        imap.end();
-        console.log('Fetch error: ' + err);
-      });
-      f.once('end', function() {
-        console.log('Done fetching all messages!');
-        imap.end();
+        f.once('end', function() {
+          console.log('Done fetching all messages!');
+          imap.end();
+        });
       });
     });
   });
+  imap.once('error', function(err) {
+  //  messages.unshift({
+  //      size: num
+  //     });
+    response.send(null);
+    console.log("imap delete error" + err);
+    // response.send(messages);
+  });
 
+  imap.once('end', function() {
+  //  messages.unshift({
+  //      size: num
+  //     });
+    response.send(null);
+    console.log('Connection ended');
+  //  response.send(messages);
+  });
   imap.connect();
 });
 
