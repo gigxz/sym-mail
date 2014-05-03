@@ -1,98 +1,111 @@
 * {
-margin: 0;
-padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
-body {
-font: 50%/1.5 Verdana, Sans-Serif;
-background: #eee;
+body, html {
+    font: 50%/1.5 Verdana, Sans-Serif;
+    background: #eee;
+    margin:0;
+    padding:0;
 }
 
-#container {
-margin: 100px auto;
-width: 738px;
-}
+
 
 #write {
-margin: 0 0 5px;
-padding: 5px;
-width: 671px;
-height: 200px;
-font: 1em/1.5 Verdana, Sans-Serif;
-background: #fff;
-border: .1em solid #f9f9f9;
--moz-border-radius: 5px;
--webkit-border-radius: 5px;
+    width: 671px;
+    height: 200px;
+
+    display:block;
+    margin: 20px auto;
+    padding: 5px;
+
+    font: 1em/1.5 Verdana, Sans-Serif;
+    background: #fff;
+    border: .1em solid #f9f9f9;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
 
+#keyboard-container {
+    margin: 0 auto;
+    padding:30px;
+    width:80%;
+    background-color: #E6E6E6;
+    border:1px solid #aeaeae;
+    border-radius:8px;
+}
+
+/* big group */
 #key {
-margin: 0;
-padding: 0;
-height: 1.8em;
-list-style: none;
+    list-style: none;
+    margin: 0 auto;
+    text-align: center; 
 }
 
+/* row groups */
+#key1, #key2, #key3, #key4 {
+    border:2px solid #E6E6E6;
+    display:inline-block;
+}
+#goBack, #key5 {
+    /*clear:left;*/
+}
 #key li {
-float: left; 
-margin: 0 auto;
-width: 2em;
-line-height: 2em;
-text-align: center;
-background: #fff;
-border: .1em solid #f9f9f9;
--moz-border-radius: .15em;
--webkit-border-radius: .15em;
+    /* the text itself */
+    font-size:1.1em;
 }
+.selectableKey {
+    display:inline-block;
+    margin-right:1px;
+    padding-left:10px;
+    padding-right:10px;
+    min-width:1.2em;
 
+    line-height: 2em;
+    text-align: center;
+    background: #fff;
+    border: 2px solid #D4D2D2;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
 .capslock, .tab, .left-shift {
     font: 50%/1.5;
     width: 2.5em;
 }
-    #key .tab, #key .delete {
-    width: 2.5em;
+
+.leftCol {
+    display:inline-block;
+    border:2px solid #E6E6E6;
 }
-    #key .capslock {
-    width: 3.4em;
+
+.rightCol {
+    display:inline-block;
+    border:2px solid #E6E6E6;
 }
-    #key .return {
-    width: 3.3em;
+
+.selectableKey:last-child {
+    margin-right:0px;
 }
-    #key .left-shift {
-    width: 4.45em;
+
+.selectableKey:first-child {
+    margin-left:0px;
 }
-    #key .right-shift {
-    width: 4.45em;
-}
-.lastitem {
-    margin-right: 0;
-}
+
 .uppercase {
     text-transform: uppercase;
-}
-#key .space, #goBack .back{
-    float: left;
-    width: 17em;
 }
 .on {
     display: none;
 }
 
-#key1, #key2, #key3, #key4 {
-    height: 2.3em; 
-    width: 31.5em;
-    margin: 0 2em 2em 0;
-    border: .1em solid #eee;
-
+#key5 .space {
+    width:8.5em;
+}
+.clear {
+    clear:both;
 }
 
-#key1key2, #key2key2, #key3key2, #key4key2 {
-    margin-top: -.25em;
+.keyboard-border {
+    /*border:2px solid #E6E6E6;*/
 }
-
-#goBack, #key5 {
-    height: 2.2em; 
-    width: 17.2em;
-    border: .1em solid #eee;
-}
-
-

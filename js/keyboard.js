@@ -9,7 +9,7 @@ window.addEventListener('load', function(){
     //set font size
     fontSize = getQueryVariable(window.location.search, 'size');
     if(fontSize==='')
-        fontSize='20'; //default
+        fontSize='18'; //default
     document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 
     addTransitions();

@@ -23,7 +23,6 @@ body, html {
 }
 .boxed {
 	border:2px solid black !important;
-	/*border-radius:2px;*/
 }
 
 
