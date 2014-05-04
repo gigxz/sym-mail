@@ -35,15 +35,16 @@ app.all('/', function(req, res, next) {
 
 app.post('/sendmail', function(request, response) {
 //     console.log(request.body.subjectText + ' ' + request.body.toText + ' ' + request.body.fromText)
-//     response.send(request.body + '');
     // Create a SMTP transport object
     var transport = nodemailer.createTransport("SMTP", {
             service: 'Gmail', // use well known service
             auth: {
-                user: request.body.fromText,
+                user: "speakyourmail@gmail.com",
                 pass: "testPassword"
             }
     });
+
+    console.log(request.body.toText)
 
     // Message object
     var message = {
@@ -146,10 +147,10 @@ function openEmailBox(box, cb) {
   imap.openBox(box, false, cb);
 }
 
-app.get('/email/:uid/:boxname', function(request, response) {
+app.get('/email/:boxname/:uid', function(request, response) {
 	var uid = request.params.uid;
-  var boxname = request.params.boxname;
-	response.render('read_email.html', [{uid: uid}, {boxname: boxname}]);
+  var boxname = request.url.split('/')[2]; //get the unparsed url sense it gets unencoded by express
+	response.render('read_email.html', {uid: uid, boxname: boxname});
 });
 
 
@@ -416,31 +417,9 @@ app.get('/delete/:boxname/:uid', function(request, response) {
     // open up all of the inboxes
     openEmailBox(boxname, function(err, box) {
       if (err) throw err;
-      // find the uid of the file
-      console.log("searching");
-      imap.search([uid], function(err, results) {
-        if (err) throw err;
-        console.log("fetching results");
-        var f = imap.fetch(results, { bodies: '1' });
-        // move that message to the trash Box
-        f.on('message', function(msg, seqno) {
-          msg.on('body', function(stream, info){
-            stream.once('end', function(){
-              imap.seq.move(info.seqno, '[Gmail]/Trash', function(err) {
-                if (err) { console.log(err); }
-              }); 
-
-            }); 
-          }); 
-        }); 
-        f.once('error', function(err) {
-          console.log('Fetch error: ' + err);
-        });
-        f.once('end', function() {
-          console.log('Done fetching all messages!');
-          imap.end();
-        });
-      });
+      imap.seq.move(uid, '[Gmail]/Trash', function(err) {
+        if (err) { console.log(err); }
+      }); 
     });
   });
   imap.once('error', function(err) {

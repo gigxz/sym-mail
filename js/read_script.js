@@ -31,8 +31,10 @@ $(window).bind('resize', function() {
 
 function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
-        history.back();
     }); 
+    window.location.href = document.referrer;
+;
+
 }
 
 
@@ -64,12 +66,6 @@ function get_message_data(callback) {
     });
 }
 
-function meta(name) {
-        var tag = document.querySelector('meta[name=' + name + ']');
-        if (tag != null)
-            return tag.content;
-        return '';
-}
 
 function reply() {
     window.location.href = '/compose/'+meta('uid');

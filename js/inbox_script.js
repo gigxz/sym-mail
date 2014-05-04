@@ -32,7 +32,7 @@ function scrollDown() {
 
 
 function readEmail(inboxmsg) {
-    window.location.href = 'http://localhost:8080/email/' + $(inboxmsg).attr('uid') + '/' + meta('boxname');
+    window.location.href = 'http://localhost:8080/email/' + meta('boxname') + '/' + $(inboxmsg).attr('uid');
 }
 
 
