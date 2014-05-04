@@ -97,12 +97,48 @@ function saveDraft(msg){
 	//AUTOSAVE AND DRAFT STUFF
 }
 
+
 /* recipients obj */
 function Recipient(nickname, email) {
 	this.nickname = nickname;
 	this.email = email;
 }
 
+function expandToSelection(){
+	pageNumber = 0; //this is what page you are on
+
+	var offset = 0 + parseInt(pageNumber);
+	url = 'http://localhost:8080/addressBook/' + offset; 
+    make_request(url, function(e) {
+    	var content = this.responseText; 
+		console.log(content);
+		var abook = JSON.parse(content); 
+		abook = abook['contacts'];
+		console.log(abook)
+		var count = 0; 
+		var recipient = $( ".recipient" );
+		for (var i = 0; i < recipient.length && i < abook.length; i++) {
+			recipient[i].innerHTML = abook[i]['nickname']; 
+		};
+
+		var emails = $( ".email-address" ); 
+		for (var i = 0; i < emails.length && i < abook.length; i++) {
+			console.log(emails[i].innerHTML); 
+			emails[i].innerHTML = abook[i]['email']; 
+		};
+    }); 
+
+    $('#recipientBoxRow').removeClass('hide');
+    // remove hide from all descendants
+    $('#recipientBoxRow').find('.hide').removeClass('hide');
+
+    $('.seePrevRecip').addClass('hide'); //no prevs to start with
+    // set id to id of seePrevRecip
+    var newID = $('.seePrevRecip').attr('id');
+    newID = newID.substring(0, newID.length-1);
+    id = newID;
+    groupNumber = 0;
+}
 
 function goBackClicked() {
     // if recipients are visible, hide

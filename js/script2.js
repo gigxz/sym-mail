@@ -188,22 +188,9 @@ function hideKeyboard() {
     }
 }
 
-function expandToSelection(){
-    make_request('http://localhost:8080/addressBook/0', function(e){
-        console.log("addressBook");
-    })
-
-    $('#recipientBoxRow').removeClass('hide');
-    // remove hide from all descendants
-    $('#recipientBoxRow').find('.hide').removeClass('hide');
-
-    $('.seePrevRecip').addClass('hide'); //no prevs to start with
-    // set id to id of seePrevRecip
-    var newID = $('.seePrevRecip').attr('id');
-    newID = newID.substring(0, newID.length-1);
-    id = newID;
-    groupNumber = 0;
-}
+// function expandToSelection(){
+//    console.log("moved to compose_script.js");
+// }
 
 function followLink(pageName) {
     var url = 'http://localhost:8080/'+pageName;
