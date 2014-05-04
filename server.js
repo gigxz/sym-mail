@@ -521,23 +521,21 @@ app.get('/box/:boxname', function(request, response) {
 	response.render('box.html', {boxname: boxname});
 });
 
-//TODO linking to inbox from another pg --> there are no messages in it
 app.get('/inbox', function(request, response) {
 	response.render('inbox.html', {boxname: 'INBOX'});
 });
 
-//TODO GET DRAFTS
 app.get('/drafts', function(request, response) {
   response.render('drafts.html', {boxname:'%5BGmail%5D%2FDrafts'});
 });
-/* compose */
 app.get('/compose', function(request, response) {
   response.render('compose.html');
 });
 /* reply */
-app.get('/compose/:uid', function(request, response) {
+app.get('/compose/:boxname/:uid', function(request, response) {
 	var uid = request.params.uid;	
-	response.render('compose.html', {uid: uid});
+  var boxname = request.params.boxname; 
+	response.render('compose.html', {boxname: boxname, uid: uid});
 });
 
 app.get('/settings', function(request, response) {

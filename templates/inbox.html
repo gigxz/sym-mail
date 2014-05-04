@@ -2,6 +2,9 @@
 <html>
 <head>
 	<meta name="boxname" content="{{boxname}}">
+    <meta name="fontsize" content="{{fontsize}}">
+    <meta name="interval" content="{{interval}}">
+
     <meta charset="UTF-8">
     <title>{{boxname}}</title>
 <!-- 
@@ -29,8 +32,11 @@
 <body>
 <!-- MAIN DIV -->
 <div id="group">
-<div id="pathHeader">Inbox
-    <a href="/templates/settings.html" type="button" onclick="followLink('settings')"><img src="/media/settings.png"/></a>
+<div id="pathHeader">
+    Inbox
+    <a href="/templates/settings.html" type="button" onclick="followLink('settings')">
+        <img src="/media/settings.png"/>
+    </a>
 </div>
 
 
@@ -45,11 +51,11 @@
 
 
     <!-- arrows for scrolling -->
-    <div class="arrows" id="group3">
-        <div id="group3group1" class="arrow" onclick="scrollUp()">
+    <div class="arrows hide" id="group3">
+        <div id="group3group1" class="arrow arrowup hide" onclick="scrollBox(1)">
             <img src="/media/arrow_up.png">
         </div>
-        <div id="group3group2" class="arrow" onclick="scrollDown()">
+        <div id="group3group2" class="arrow arrowdown hide" onclick="scrollBox(-1)">
             <img src="/media/arrow_down.png">
         </div>
     </div>
@@ -182,7 +188,7 @@
 </div> <!-- end second half -->    
   
 </div> <!-- end whole inbox -->
-<div id="pageIndicator">page 1 of 2</div>
+<div id="pageIndicator"></div>
 
 
 </div> <!-- end of wrapper -->

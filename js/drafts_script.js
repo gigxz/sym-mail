@@ -9,7 +9,12 @@ window.addEventListener('load', function(){
     get_box_data(function(data) {
         //totalNumber = data.total;
         //maxPages = totalNumber/6;
-        replaceBoxMessages(data);
+        if(data.length>0) {
+            replaceBoxMessages(data);
+        }
+        else {
+            console.log("ALERT no messages to show");
+        }
         setPageIndicator();
         showHideNavigationArrows();
     });

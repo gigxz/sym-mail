@@ -46,8 +46,8 @@ function get_message_data(callback) {
             $("#from").text(data[0].from);
 
             var toString = '';
-            console.log(data[0].to);
-            console.log(data[0].to.name);
+            //console.log(data[0].to);
+            //console.log(data[0].to.name);
             for(item in data[0].to) {
                 var n = data[0].to[item].name;
                 var e = data[0].to[item].address;
@@ -68,5 +68,6 @@ function get_message_data(callback) {
 
 
 function reply() {
-    window.location.href = '/compose/'+meta('uid');
+    console.log("REPLY! REDIRECTING TO : "+'/compose/'+meta('boxname')+'/'+meta('uid'))
+    window.location.href = '/compose/'+meta('boxname')+'/'+meta('uid');
 }
