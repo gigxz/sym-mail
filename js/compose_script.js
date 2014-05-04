@@ -5,15 +5,10 @@ window.onload = function() {
 	console.log("COMPOSE LOADING");
 	if(meta('uid')!='') {
 		get_reply_data(function(subjText) {
-			if(subjText) {
-				if(subjText.length > 30) {
-					subjText = subjText.substring(0, 30 + "...");
-				}
+			if(subjText && subjText.length > 30) {
+				subjText = subjText.substring(0, 30 + "...");
 			}
-			showHideScrollArrows();
-
-
-
+			
 			var header = "Inbox";
 	        if(document.referrer.indexOf("drafts") > -1) {
 	            header = "Drafts";
@@ -24,28 +19,36 @@ window.onload = function() {
 	        else {
 	            header += " > Read Message";
 	        }
+	        header += " > Reply";
 	        $('#pathHeader').text(header);
+
+	        showHideScrollArrows();
 		});
 	}
 	else {
 		$('#pathHeader').text('Compose');
 	}
-    
+
+	$("#write").on('change keyup paste', function() {
+    	showHideScrollArrows();
+	});
 }
 function get_reply_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('uid'), function(e) {
+	console.log("REQUESTING REPLY DATA FOR  "+meta('boxname')+'/'+meta('uid'));
+    make_request('http://localhost:8080/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
         if (this.status == 200) {    
-            var content = this.responseText;
-            var data = JSON.parse(content);
+			var content = this.responseText;
+			var data = JSON.parse(content);
 
-            $("#from").html();
-            $('#to').html(data[0].from);
-            $("#subjectText").html("Re: " + data[0].subject);
-           //TODO get plain text, put in box	
-           //$("#write").html(data[0].text);
+			$("#from").html();
+			$("#to").html(data[0].from);
+			$("#subjectText").html("Re: " + data[0].subject);
+   //         //TODO get plain text, put in box	
+   //         //$("#write").html(data[0].text);
 
-			callback(data[0].subject);
-        } else {
+			 callback(data[0].subject);
+        }
+        else {
             alert("Feed Request was invalid.");
         }               
     });
