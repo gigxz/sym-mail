@@ -23,7 +23,6 @@
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
     <script type="text/javascript" src="/js/inbox_script.js"></script>
-    <script type="text/javascript" src="/js/drafts_script.js"></script>
 
 </head>
 <body>
@@ -45,11 +44,11 @@
 
 
     <!-- arrows for scrolling -->
-    <div class="arrows" id="group3">
-        <div id="group3group1" class="arrow" onclick="scrollUp()">
+    <div class="arrows hide" id="group3">
+        <div id="group3group1" class="arrow hide" onclick="scrollBox(1)">
             <img src="/media/arrow_up.png">
         </div>
-        <div id="group3group2" class="arrow" onclick="scrollDown()">
+        <div id="group3group2" class="arrow hide" onclick="scrollBox(-1)">
             <img src="/media/arrow_down.png">
         </div>
     </div>

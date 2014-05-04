@@ -21,17 +21,17 @@ window.addEventListener('load', function(){
 function cyclingOn(num) {
     if(num===1) {
         // turn on
-        console.log("TURNING CYCLING ON");
+        clearInterval(intervalFunction); // just in case
         groupNumber = 0;
         id = 'group';
         waitTime = 1000;
         intervalFunction = setInterval(cycle, waitTime);
         clickHandler(); 
     }
-    else if(num===0) {
-        //turn off
-        clearInterval(intervalFunction);
-    }
+    // else if(num===0) {
+    //     //turn off
+    //     clearInterval(intervalFunction);
+    // }
 }
 
 
@@ -54,13 +54,13 @@ function showFontValue(newValue) {
 }
 
 function setFontSize(val) {
-    console.log("setting font size var to "+val);
+    //console.log("setting font size var to "+val);
     fontSize = val;
 	document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 }
 
 function setCycleTime(val) {
-	console.log("setting cycle time var to "+val*1000);
+	//console.log("setting cycle time var to "+val*1000);
 	waitTime = val*1000;
 }
 
@@ -89,7 +89,6 @@ var clickHandler = function() {
                 }
                 else {
                     if ($('#'+id+groupNumber).hasClass('requiresKeyboard')){
-                        console.log("CLICKED ITEM REQUIRES KEYBOARD");
                         expandKeyboard();
                     }
                     else {
@@ -104,13 +103,13 @@ var clickHandler = function() {
                             //TODO FIX THIS BUG WTF
                             if(groupNumber===0)
                                  groupNumber=1;
-                            console.log("SCRIPT2: Clicking on: "+id+groupNumber);
                             document.getElementById(id+groupNumber).click();
                         } 
-                        intervalFunction = setInterval(cycle, waitTime);   
+                    
+                        intervalFunction = setInterval(cycle, waitTime);     
                     }
                 }
-
+                 
                 console.log("CLICK IN SCRIPT2: "+id+groupNumber);
            }
         });
@@ -174,7 +173,6 @@ var cycle = function () {
 
 function expandKeyboard(){
     if ($('#keyboardFrame').hasClass("hide") ){
-        console.log("SHOWING KEYBOARD");
         cyclingOn(0); // TURN OFF CYCLING
         $('#keyboardFrame').removeClass("hide");
         document.getElementById("keyboardFrame").contentWindow.focus();
@@ -182,7 +180,7 @@ function expandKeyboard(){
     }
 }
 function hideKeyboard() {
-    if ( ! $('#keyboardFrame').hasClass("hide")){
+    if (!$('#keyboardFrame').hasClass("hide")){
         $('#keyboardFrame').addClass("hide");
         cyclingOn(1); // TURN ON CYCLING
     }

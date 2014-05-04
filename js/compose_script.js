@@ -2,37 +2,33 @@ var recipients = [];
 
 /* ON LOAD */
 window.onload = function() {
+	console.log("COMPOSE LOADING");
 	if(meta('uid')!='') {
 		get_reply_data(function(subjText) {
 			if(subjText) {
 				if(subjText.length > 30) {
 					subjText = subjText.substring(0, 30 + "...");
 				}
-				$('#pathHeader').text('Inbox > '+subjText + ' > Reply');
-			}
-			else {
-				$('#pathHeader').text('Compose');
 			}
 			showHideScrollArrows();
+
+
+
+			var header = "Inbox";
+	        if(document.referrer.indexOf("drafts") > -1) {
+	            header = "Drafts";
+	        }
+	        if(subjText) {
+	            header += " > " + subjText;
+	        }
+	        else {
+	            header += " > Read Message";
+	        }
+	        $('#pathHeader').text(header);
 		});
-
-		var header = "Inbox";
-        if(document.referrer.indexOf("drafts") > -1) {
-            header = "Drafts";
-        }
-        if($("#subject").text().length > 0) {
-            var subj = $("#subject").text();
-            if(subj.length > 100) {
-                subj = subj.substring(0,50) + "...";
-            }
-            header += " > " + subj;
-        }
-        else {
-            header += " > Read Message";
-        }
-        $('#pathHeader').text(header);
-
-
+	}
+	else {
+		$('#pathHeader').text('Compose');
 	}
     
 }

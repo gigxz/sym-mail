@@ -7,7 +7,7 @@ var keyNumber = 0,
     isActive = false;
 
 window.addEventListener('load', function(){
-    //set font size ( get it from meta tag )
+    //TODO set font size ( get it from meta tag )
     fontSize='18'; //default
     isActive = true;
     addKeyStyles();
