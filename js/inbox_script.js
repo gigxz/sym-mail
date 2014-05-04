@@ -6,7 +6,7 @@ window.addEventListener('load', function(){
     pageNumber = 1;
     maxPages = 5; //TODO
 
-    get_box_data(function(data) {
+    get_box_data_page(pageNumber, function(data) {
         //totalNumber = data.total;
         //maxPages = totalNumber/6;
         replaceBoxMessages(data);
@@ -49,6 +49,7 @@ function setPageIndicator() {
 
 function scrollBox(dir) {
     // page up
+    alert(dir);
     if(dir===1) {
         pageNumber--;
         get_box_data_page(pageNumber, function(data) {

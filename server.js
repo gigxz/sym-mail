@@ -340,29 +340,45 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
 
 });
 
-app.get('/getemails/:boxname', function(request, response) {
-
-  imap = new Imap({
-    user: 'speakyourmail@gmail.com',
-    password: 'testPassword',  
-    host: 'imap.gmail.com',
-    port: 993,
-    tls: true
-  });
+// app.get('/getemails/:boxname', function(request, response) {
+app.get('/getemails/:boxname/:pagenum', function(request, response) {
+  	imap = new Imap({
+    	user: 'speakyourmail@gmail.com',
+    	password: 'testPassword',  
+    	host: 'imap.gmail.com',
+    	port: 993,
+    	tls: true
+	});
 
   var boxname = request.params.boxname;
+  var pagenum = request.params.pagenum;
   var text='';
   var messages = [];
   var num = 1;
   imap.once('ready', function() {
     openEmailBox(boxname, function(err, box) {
       if (err) throw err;
-      var f = imap.seq.fetch(box.messages.total + ':' + (box.messages.total-5), {
-  //     var f = imap.seq.fetch(box.messages.total, {
-  //       bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
-        bodies: '',
-        struct: true
-      });
+//       var f = imap.seq.fetch(box.messages.total + ':' + (box.messages.total-5), {
+//         bodies: '',
+//         struct: true
+//       });
+
+      		//FROM HERE
+      		var f;
+      		var remaining = box.messages.total-((pagenum-1)*6);
+      		if (remaining < 6) {
+      			f = imap.seq.fetch(remaining + ':1', {
+        			bodies: '',
+        			struct: true
+      			});
+      		} else {
+      			f = imap.seq.fetch(remaining + ':' + (remaining-5), {
+        			bodies: '',
+        			struct: true
+      			});      		
+      		}
+      		//TO HERE
+
       f.on('message', function(msg, seqno) {
         //console.log('Message #%d', seqno);
         var prefix = '(#' + seqno + ') ';
