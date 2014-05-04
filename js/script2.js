@@ -189,6 +189,10 @@ function hideKeyboard() {
 }
 
 function expandToSelection(){
+    make_request('http://localhost:8080/addressBook/0', function(e){
+        console.log("addressBook");
+    })
+
     $('#recipientBoxRow').removeClass('hide');
     // remove hide from all descendants
     $('#recipientBoxRow').find('.hide').removeClass('hide');
