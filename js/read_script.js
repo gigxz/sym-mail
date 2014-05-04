@@ -30,15 +30,16 @@ $(window).bind('resize', function() {
 });
 
 function deleteMessage(inboxmsg) {
-    make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
-        console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
+    make_request('http://localhost:8080/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
     }); 
-    history.back();
+    //window.location.href = document.referrer;
+;
+
 }
 
 
 function get_message_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('uid'), function(e) {
+    make_request('http://localhost:8080/getemail/' + meta('boxname') + '/' + meta('uid'), function(e) {
         if (this.status == 200) {    
             var content = this.responseText;
             var data = JSON.parse(content);

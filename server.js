@@ -2,7 +2,7 @@ var escapeHTML = require('escape-html');
 var express = require('express');
 var anyDB = require('any-db');
 var MailParser = require('mailparser').MailParser;
-var conn;
+var conn = anyDB.createConnection('sqlite3://addressBook.db');
 var app = express();
 var xoauth2 = require("xoauth2"),
     xoauth2gen;
@@ -26,6 +26,47 @@ var Imap = require('imap'),
     inspect = require('util').inspect;
 
 
+/*
+ADDRESS BOOK SQL STUFF!
+*/
+var makeAddressBook = "CREATE TABLE IF NOT EXISTS addressBook (clientEmail TEXT, recipientEmail TEXT, recipientNickname TEXT, emailCount INTEGER);";
+
+var addAddress = "INSERT INTO addressBook (clientEmail, recipientEmail, recipientNickname, emailCount)" + "VALUES ($1, $2, $3, 1);";
+
+var selectAddress = "SELECT recipientEmail, emailCount FROM addressBook WHERE clientEmail = $1 AND recipientEmail = $2";
+
+var updateAddress = "REPLACE INTO addressBook (clientEmail, reciepientEmail, emailCount) VALUES ($1, $2, $4);";
+
+var getMostCommonAddresses = "SELECT recipientEmail, recipientNickname FROM addressBook WHERE clientEmail = $1 ORDER BY emailCount DESC LIMIT 6 OFFSET $2;";
+
+
+conn.query(makeAddressBook);
+
+function addressBookEntry(clientEmail, recipientEmail, recipientNickname) {
+  console.log("addressBook");
+  var inDatabase = true; 
+  conn.query(selectAddress, [clientEmail, recipientEmail])
+    .on('row', function(row) {
+     //that row exits so update it and add one to the row's count 
+     inDatabase = false;  
+      conn.query(updateAddress, [clientEmail, recipientEmail, recipientNickname, row['emailCount'] + 1])
+      console.log("updating the address");
+      
+    })
+    .on('end', function(){
+      if (inDatabase) {
+        conn.query(addAddress, [clientEmail,recipientEmail, recipientNickname]); 
+        console.log("added a new address");
+      }
+    }); 
+}
+
+/*
+END OF ADDRESS BOOK SETUP STUFF
+*/
+
+
+
 //this is for testing, creates a security issue, but allows local host
 app.all('/', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -34,16 +75,16 @@ app.all('/', function(req, res, next) {
  });
 
 app.post('/sendmail', function(request, response) {
-//     console.log(request.body.subjectText + ' ' + request.body.toText + ' ' + request.body.fromText)
-//     response.send(request.body + '');
+    //console.log(request.body.subjectText + ' ' + request.body.toText + ' ' + request.body.fromText)
     // Create a SMTP transport object
     var transport = nodemailer.createTransport("SMTP", {
             service: 'Gmail', // use well known service
             auth: {
-                user: request.body.fromText,
+                user: "speakyourmail@gmail.com",
                 pass: "testPassword"
             }
     });
+
 
     // Message object
     var message = {
@@ -57,21 +98,17 @@ app.post('/sendmail', function(request, response) {
         // Subject of the message
         subject: request.body.subjectText, //
 
-        text: request.body.bodyText,
-
-        // An array of alternatives
-        alternatives:[
-            {
-                contentType: "text/x-web-markdown",
-                contents: '**markdown** alternative'
-            },
-            {
-                contentType: "text/html; charset=utf-8",
-                contentEncoding: "7bit",
-                contents: '<h1>html alternative</h1>'
-            }
-        ]
+        text: request.body.bodyTextf
     };
+
+    /* 
+    adding things to the address book 
+    */
+    toArray = request.body.toText.split(','); 
+    toArray.forEach(function(recipientEmail) {
+      console.log("rb From" + recipientEmail + " recipientEmail " + recipientEmail);
+      addressBookEntry(request.body.fromText, recipientEmail, "nickname"); 
+    })
 
     transport.sendMail(message, function(error){
         if(error){
@@ -86,6 +123,23 @@ app.post('/sendmail', function(request, response) {
     });
 
 }); 
+
+app.get('/addressBook/:offset', function(request, response){
+  var offset = request.params.offset; 
+  //AUTH!!!! ORIGINAL EMAIL
+  var contacts = '{ "contacts": ['; 
+  var myEmail = "speakyourmail@gmail.com";
+  conn.query(getMostCommonAddresses, [myEmail, offset], function(err, result){
+    result.rows.forEach(function(row){
+      contacts += '{"email": "' + row['recipientEmail'] + '",  "nickname": "' + row['nickname'] + '"},'; 
+      console.log("adress book " + row); 
+    }); 
+  });
+
+  contacts = contacts.slice(0, -1); 
+  contacts += ']}'
+  response.send(contacts); 
+});
 
 app.post('/login', function(request, response) {
 	response.send(request.body.email + ' ' + request.body.password);
@@ -119,16 +173,13 @@ app.get('/mailboxes', function(request, response) {
 			var text = '';
 			for (var key in boxes) {
 				text += key + ',';
-// 				mailboxes.push({
-// 					box: key
-// 				});
-			}
-			mailboxes.push({
-				boxes: text
-			});
+			 }
+  		mailboxes.push({
+  			boxes: text
+  		});
 			imap.end();
-		});
-	});
+    });
+  });
 	imap.once('error', function(err) {
   		console.log('Error retrieving mailboxes');
 		response.send(mailboxes);
@@ -143,29 +194,31 @@ app.get('/mailboxes', function(request, response) {
 
 //	IMAP CALL TO OPEN MAILBOXE
 function openEmailBox(box, cb) {
-  imap.openBox(box, true, cb);
+  imap.openBox(box, false, cb);
 }
 
-app.get('/email/:uid', function(request, response) {
+app.get('/email/:boxname/:uid', function(request, response) {
 	var uid = request.params.uid;
-	response.render('read_email.html', {uid: uid});
+  var boxname = request.url.split('/')[2]; //get the unparsed url sense it gets unencoded by express
+	response.render('read_email.html', {uid: uid, boxname: boxname});
 });
 
 
-app.get('/getemail/:uid', function(request, response) {
+app.get('/getemail/:boxname/:uid', function(request, response) {
   imap = new Imap({
     user: 'speakyourmail@gmail.com',
     password: 'testPassword',  host: 'imap.gmail.com',
     port: 993,
-    tls: true
+    tls: true,
+    debug: console.log
   });
-
+  boxname = request.params.boxname
   uid = request.params.uid;
   text='';
   messages = [];
   //var num = 1;
   imap.once('ready', function() {
-    openEmailBox('INBOX', function(err, box) {
+    openEmailBox(boxname, function(err, box) {
       if (err) throw err;
       
       imap.search([uid], function(err, results) {
@@ -311,7 +364,7 @@ app.get('/getemails/:boxname', function(request, response) {
         struct: true
       });
       f.on('message', function(msg, seqno) {
-        console.log('Message #%d', seqno);
+        //console.log('Message #%d', seqno);
         var prefix = '(#' + seqno + ') ';
         
         var headers='';
@@ -324,11 +377,11 @@ app.get('/getemails/:boxname', function(request, response) {
             buffer += chunk.toString('utf8');
           });
           stream.once('end', function() {
-            console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+            //console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
           });
         });
         msg.once('attributes', function(attrs) {
-          console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+          //console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
           //uid = attrs.uid;
         });
         msg.once('end', function() {
@@ -345,7 +398,7 @@ app.get('/getemails/:boxname', function(request, response) {
            	
         	var mailparser = new MailParser();
         	mailparser.on('end', function(mail_object) {
-          	console.log(mail_object.from[0].name);
+          	//console.log(mail_object.from[0].name);
     				messages.unshift({
     					sender: mail_object.from[0].name,
     					subject: mail_object.subject,
@@ -400,44 +453,45 @@ app.get('/getemails/:boxname', function(request, response) {
   imap.connect();
 });
 
-app.get('/delete/:uid', function(request, response) {
+app.get('/delete/:boxname/:uid', function(request, response) {
 
   imap = new Imap({
     user: 'speakyourmail@gmail.com',
     password: 'testPassword',  host: 'imap.gmail.com',
     port: 993,
-    tls: true
+    tls: true,
+    debug: console.log
   });
 
   uid = request.params.uid;
+  boxname = request.params.boxname;
+  console.log(boxname);
   imap.once('ready', function() {
     // open up all of the inboxes
-    openEmailBox('INBOX', function(err, box) {
+    openEmailBox(boxname, function(err, box) {
       if (err) throw err;
-      console.log(uid);
-      // find the uid of the file
-      imap.search([uid], function(err, results) {
-        if (err) throw err;
-        var f = imap.fetch(results, {
-          bodies: '',
-          struct: true
-        });
-        // move that message to the trash Box
-        f.on('message', function(msg, seqno) {
-          move(msg, '[Gmail]/Trash');
-        });
-      });
-      f.once('error', function(err) {
-        imap.end();
-        console.log('Fetch error: ' + err);
-      });
-      f.once('end', function() {
-        console.log('Done fetching all messages!');
-        imap.end();
-      });
+      imap.seq.move(uid, '[Gmail]/Trash', function(err) {
+        if (err) { console.log(err); }
+      }); 
     });
   });
+  imap.once('error', function(err) {
+  //  messages.unshift({
+  //      size: num
+  //     });
+    response.send(null);
+    console.log("imap delete error" + err);
+    // response.send(messages);
+  });
 
+  imap.once('end', function() {
+  //  messages.unshift({
+  //      size: num
+  //     });
+    response.send(null);
+    console.log('Connection ended');
+  //  response.send(messages);
+  });
   imap.connect();
 });
 

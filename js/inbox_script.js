@@ -74,8 +74,7 @@ function scrollBox(dir) {
 }
 
 function readEmail(inboxmsg) {
-    //TODO IS THIS DIFFERENT IF IT IS A DRAFT? yes
-    window.location.href = 'http://localhost:8080/email/' + $(inboxmsg).attr('uid');
+    window.location.href = 'http://localhost:8080/email/' + meta('boxname') + '/' + $(inboxmsg).attr('uid');
 }
 
 

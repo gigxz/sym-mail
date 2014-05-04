@@ -67,7 +67,30 @@ function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
         console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
     }); 
-    history.back();
+    //window.location.href = document.referrer;
+
+}
+
+
+function sendMail(msg){
+    var request = new XMLHttpRequest();
+    url = 'http://localhost:8080/sendmail';
+    request.open('POST', url, true);
+   	request.setRequestHeader('Content-Type', "application/json"); 
+   	console.log("sending messages");
+    request.send(JSON.stringify({
+    	"fromText": document.getElementById("fromText").value, 
+    	"toText": document.getElementById("toText").value,
+    	"subjectText": document.getElementById("subjectText").value,
+    	"bodyTexts": document.getElementById("write").value
+    }));
+    window.location.href = "http://localhost:8080/inbox";
+    //return request;
+}
+
+function saveDraft(msg){
+	//TODO
+	//AUTOSAVE AND DRAFT STUFF
 }
 
 /* recipients obj */
