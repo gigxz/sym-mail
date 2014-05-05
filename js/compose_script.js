@@ -29,8 +29,15 @@ $(window).load(function() {
 	}
 
 	$("#write").on('change keyup paste', function() {
+		console.log("write");
     	showHideScrollArrows();
 	});
+
+    $("#group2group1group1group1").on('change keyup paste', function() {
+		console.log("keyup");
+        this.style.height = 0;
+        this.style.height = this.scrollHeight + 'px';
+    });
 });
 
 
@@ -108,6 +115,7 @@ function Recipient(nickname, email) {
 }
 
 function expandToSelection(){
+	console.log("selecting");
 	pageNumber = 0; //this is what page you are on
 
 	var offset = 0 + parseInt(pageNumber);
@@ -178,7 +186,7 @@ function toggleRecipient(obj) {
 			recipString += ", ";
 		}
 	}
-	$('#toText').text(recipString);
+	$('#group2group1group1group1').text(recipString);
 	//TODO resize if there is overflow
 }
 
@@ -203,3 +211,4 @@ function cycleRecipients(dir) {
         // see next 4
     }
 }
+

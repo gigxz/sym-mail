@@ -27,7 +27,6 @@ table.compose-table td {
 .right-col {
 }
 
-
 .style-border {
 	border:1px solid #dddddd;
 }
@@ -43,8 +42,9 @@ table.compose-table td {
 	-webkit-border-radius: 5px;
 }
 /* to-field textarea */
-#toText {
-
+#to {
+	width: 19em;
+	padding: 1px;
 }
 
 /* subject-field textarea */
