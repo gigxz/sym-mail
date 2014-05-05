@@ -6,6 +6,7 @@ var groupNumber = 0,
     fontSize;
 
 window.addEventListener('load', function(){
+    $(window).focus();
     //set font size
     fontSize = getQueryVariable(window.location.search, 'size');
     if(fontSize==='')
@@ -90,7 +91,7 @@ var clickHandler = function() {
                 }
                 else {
                     if ($('#'+id+groupNumber).hasClass('requiresKeyboard')){
-                        expandKeyboard();
+                        expandKeyboard($('#'+id+groupNumber).find('textarea').attr('id'));
                     }
                     else {
                         // if one level down exists AND is not hidden
@@ -175,10 +176,12 @@ var cycle = function () {
 }
 
 
-function expandKeyboard(){
+function expandKeyboard(textAreaID){
+    console.log('EXPANDING KEYBOARD FOR '+textAreaID);
     if ($('#keyboardFrame').hasClass("hide") ){
         cyclingOn(0); // TURN OFF CYCLING
         $('#keyboardFrame').removeClass("hide");
+        $('#keyboardFrame').attr('name', textAreaID); // tell keyboard where to type
         $('#keyboardFrame').attr('src', '/keyboard');
         document.getElementById("keyboardFrame").contentWindow.focus();
     }
@@ -186,6 +189,8 @@ function expandKeyboard(){
 function hideKeyboard() {
     if (!$('#keyboardFrame').hasClass("hide")){
         $('#keyboardFrame').addClass("hide");
+        $('#keyboardFrame').removeAttr('name'); 
+        $('#keyboardFrame').removeAttr('src');
         cyclingOn(1); // TURN ON CYCLING
         $(window).focus();
     }
