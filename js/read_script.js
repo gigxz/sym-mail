@@ -43,7 +43,8 @@ function get_message_data(callback) {
         if (this.status == 200) {    
             var content = this.responseText;
             var data = JSON.parse(content);
-            $("#from").text(data[0].from);
+            $("#from").text(data[0].from.name);
+			console.log(data[0].from);
 
             var toString = '';
             console.log(data[0].to);

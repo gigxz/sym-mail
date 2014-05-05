@@ -53,9 +53,10 @@ function get_reply_data(callback) {
 			var data = JSON.parse(content);
 
 			$("#from").html();
-			$("#toTextArea").html(data[0].from);
-			console.log(data[0]);
-			new Recipient(data[0].from, addr)
+			$("#toTextArea").html(data[0].from.name);
+			console.log("from: ");
+			console.log(data[0].from.name+","+data[0].from.address);
+			recipients.push(new Recipient(data[0].from.name, data[0].from.address));
 			$("#subjectText").html("Re: " + data[0].subject);
    //         //TODO get plain text, put in box	
    //         
@@ -200,7 +201,7 @@ function toggleRecipient(obj) {
 		}
 	}
 	$('#toTextArea').text(recipString);
-	//TODO resize if there is overflow
+	$('#toTextArea').change();
 }
 
 function removeRecipient(email) {
