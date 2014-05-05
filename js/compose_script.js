@@ -85,8 +85,10 @@ function submitEmail() {
 function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
         console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
+        window.location.href = 'http://localhost:8080/';
     }); 
-    window.location.href = document.referrer;
+    
+   // window.history.go(0);
 
 }
 
