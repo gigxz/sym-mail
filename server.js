@@ -30,6 +30,8 @@ var Imap = require('imap'),
 ADDRESS BOOK SQL STUFF!
 */
 var makeAddressBook = "CREATE TABLE IF NOT EXISTS addressBook (clientEmail TEXT, recipientEmail TEXT, recipientNickname TEXT, emailCount INTEGER, PRIMARY KEY (clientEmail, recipientEmail));";
+var addSelf = "INSERT INTO addressBook (clientEmail, recipientEmail, recipientNickname, emailCount)"; 
+addSelf += "VALUES ("+ "'speakyourmail@gmail.com'" + "," + "'speakyourmail@gmail.com'" + "," + "'me'"+ ", 1);";
 
 var addAddress = "INSERT INTO addressBook (clientEmail, recipientEmail, recipientNickname, emailCount)" + "VALUES ($1, $2, $3, 1);";
 
@@ -41,6 +43,7 @@ var getMostCommonAddresses = "SELECT recipientEmail, recipientNickname FROM addr
 
 
 conn.query(makeAddressBook);
+conn.query(addSelf);
 
 function addressBookEntry(clientEmail, recipientEmail, recipientNickname) {
   console.log("addressBook");
@@ -56,7 +59,7 @@ function addressBookEntry(clientEmail, recipientEmail, recipientNickname) {
   q.on('end', function(){
       if (inDatabase) {
         conn.query(addAddress, [clientEmail,recipientEmail,recipientNickname]); 
-        console.log("added a new address");
+        console.log("added a new address " + clientEmail + " recipientEmail: " + recipientEmail);
       }
     }); 
 }
@@ -91,9 +94,7 @@ function sendmail(message){
     }
     else {
       console.log('Message sent successfully!');
-      response.send('Message Sent Successfully!');
     // if you don't want to use this transport object anymore, uncomment following line
-      transport.close(); // close the connection pool
     }
   });
 }
@@ -101,12 +102,10 @@ function sendmail(message){
 app.post('/sendmail', function(request, response) {
   //console.log(request.body.subjectText + ' ' + request.body.toText + ' ' + request.body.fromText)
   // Create a SMTP transport object
-  from = request.body.fromText;
   from = "speakyourmail@gmail.com";
-  console.log("calling sendmail");
+  console.log("calling sendmail to  " + request.body.toText);
   // Message object
   var message = {
-
       // sender info
       from: from,
 
@@ -116,7 +115,7 @@ app.post('/sendmail', function(request, response) {
       // Subject of the message
       subject: request.body.subjectText, //
 
-      text: request.body.bodyTextf
+      text: request.body.bodyText
   };
 
   sendmail(message);
@@ -126,7 +125,7 @@ app.post('/sendmail', function(request, response) {
   */
   toArray = request.body.toText.split(','); 
   toArray.forEach(function(recipientEmail) {
-    addressBookEntry(from, recipientEmail, "nickname"); 
+    addressBookEntry(from, recipientEmail, ""); 
   })
 
 }); 
@@ -231,7 +230,6 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
     password: 'testPassword',  host: 'imap.gmail.com',
     port: 993,
     tls: true,
-    debug: console.log
   });
   boxname = request.params.boxname
   uid = request.params.uid;
@@ -351,28 +349,19 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
   imap.once('ready', function() {
     openEmailBox(boxname, function(err, box) {
       if (err) throw err;
-
-
-
-//       var f = imap.seq.fetch(box.messages.total + ':' + (box.messages.total-5), {
-//         bodies: '',
-//         struct: true
-//       });
-
-      		//FROM HERE
-      		var f;
-      		var remaining = box.messages.total-((pagenum-1)*6);
-      		if (remaining < 6) {
-      			f = imap.seq.fetch(remaining + ':1', {
-        			bodies: '',
-        			struct: true
-      			});
-      		} else {
-      			f = imap.seq.fetch(remaining + ':' + (remaining-5), {
-        			bodies: '',
-        			struct: true
-      			});      		
-      		}
+    		var f;
+    		var remaining = box.messages.total-((pagenum-1)*6);
+    		if (remaining < 6) {
+    			f = imap.seq.fetch(remaining + ':1', {
+      			bodies: '',
+      			struct: true
+    			});
+    		} else {
+    			f = imap.seq.fetch(remaining + ':' + (remaining-5), {
+      			bodies: '',
+      			struct: true
+    			});      		
+    		}
 
       f.on('message', function(msg, seqno) {
         //console.log('Message #%d', seqno);
@@ -471,7 +460,6 @@ app.get('/delete/:boxname/:uid', function(request, response) {
     password: 'testPassword',  host: 'imap.gmail.com',
     port: 993,
     tls: true,
-    debug: console.log
   });
 
   uid = request.params.uid;

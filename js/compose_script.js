@@ -81,12 +81,15 @@ function sendMail(msg){
     url = 'http://localhost:8080/sendmail';
     request.open('POST', url, true);
    	request.setRequestHeader('Content-Type', "application/json"); 
-   	console.log("sending messages");
+   	var emailString = '';
+   	recipients.forEach(function(x){
+   		emailString += x.email + ','; 
+   	});
+   	emailString = emailString.slice(0,-1);
     request.send(JSON.stringify({
-    	"fromText": document.getElementById("fromText").value, 
-    	"toText": document.getElementById("toText").value,
+    	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
-    	"bodyTexts": document.getElementById("write").value
+    	"bodyText": document.getElementById("write").value
     }));
     window.location.href = "http://localhost:8080/inbox";
     //return request;
