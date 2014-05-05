@@ -89,7 +89,7 @@ function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
         console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
     }); 
-    //window.location.href = document.referrer;
+    window.location.href = document.referrer;
 
 }
 
@@ -108,7 +108,7 @@ function saveDraft(msg){
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value
     }));
-    //window.location.href = "http://localhost:8080/inbox";
+    swindow.location.href = "http://localhost:8080/inbox";
 }
 
 
