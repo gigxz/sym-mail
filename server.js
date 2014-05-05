@@ -342,7 +342,7 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
 
 // app.get('/getemails/:boxname', function(request, response) {
 app.get('/getemails/:boxname/:pagenum', function(request, response) {
-  	imap = new Imap({
+	imap = new Imap({
     	user: 'speakyourmail@gmail.com',
     	password: 'testPassword',  
     	host: 'imap.gmail.com',
@@ -350,11 +350,11 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
     	tls: true
 	});
 
-  var boxname = request.params.boxname;
-  var pagenum = request.params.pagenum;
-  var text='';
-  var messages = [];
-  var num = 1;
+  	var boxname = request.params.boxname;
+  	var pagenum = request.params.pagenum;
+  	var text='';
+  	var messages = [];
+  	var num = 1;
   imap.once('ready', function() {
     openEmailBox(boxname, function(err, box) {
       if (err) throw err;
