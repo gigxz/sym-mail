@@ -176,26 +176,6 @@ var cycle = function () {
 }
 
 
-function expandKeyboard(textAreaID){
-    console.log('EXPANDING KEYBOARD FOR '+textAreaID);
-    if ($('#keyboardFrame').hasClass("hide") ){
-        cyclingOn(0); // TURN OFF CYCLING
-        $('#keyboardFrame').removeClass("hide");
-        $('#keyboardFrame').attr('name', textAreaID); // tell keyboard where to type
-        $('#keyboardFrame').attr('src', '/keyboard');
-        document.getElementById("keyboardFrame").contentWindow.focus();
-    }
-}
-function hideKeyboard() {
-    if (!$('#keyboardFrame').hasClass("hide")){
-        $('#keyboardFrame').addClass("hide");
-        $('#keyboardFrame').removeAttr('name'); 
-        $('#keyboardFrame').removeAttr('src');
-        cyclingOn(1); // TURN ON CYCLING
-        $(window).focus();
-    }
-}
-
 function followLink(pageName) {
     var url = 'http://localhost:8080/'+pageName;
     window.location.href = url;//+'?size='+fontSize;

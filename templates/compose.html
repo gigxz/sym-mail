@@ -13,6 +13,7 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script src="http://www.appelsiini.net/download/jquery.viewport.js"></script>
     <script type="text/javascript" src="/js/compose_script.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
     
@@ -29,7 +30,7 @@
 
 <!--BUTTONS-->
 <div class="nav-buttons">
-    <div id="group1" class="white-border">
+    <div id="group1" class="firstButtonGroup white-border">
 		<div id="group1group1" type="button" class="btn btn-primary btn-block" onclick='followLink("inbox")'>Inbox</div>
 		<div id="group1group2" type="button" class="btn btn-primary btn-block" onclick='sendMail(this)'>Send</div>
 		<div id="group1group3" type="button" class="btn btn-primary btn-block" onclick='saveDraft(this)'>Save Draft</div>
@@ -55,22 +56,21 @@
 <!--COMPOSE-->
 <div class="compose">
 
-<div id="group2">
-    <div id="group2group1" class="white-border">
+<div id="group2" class="white-border">
 
     <!-- TO field -->
-    <table class="compose-table"  id="group2group1group1">
+    <table class="compose-table"  id="group2group1">
         <tr>
             <td class="left-col">
                 <span class="label label-default">To</span>
             </td>
             <td class="middle-col">
-                <div class="compose-table requiresKeyboard" id="group2group1group1group1">
+                <div class="compose-table requiresKeyboard" id="group2group1group1">
                     <textarea class="textBox" id="toTextArea"> </textarea>
                 </div>
             </td>
 			<td class="right-col">
-				<div id = "group2group1group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection()">Select</div>
+				<div id = "group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection()">Select</div>
 			</td>
         </tr>
     </table>
@@ -80,7 +80,7 @@
         <!-- PREVIOUS -->
     	<tr>
     		<td>
-                <div id="group2group1group1group2group1" class="seePrevRecip hide" onclick="cycleRecipients(0)">
+                <div id="group2group1group2group1" class="seePrevRecip hide" onclick="cycleRecipients(0)">
                     <img src="/media/arrow_up.png">
                 </div>
             </td>
@@ -88,7 +88,7 @@
         <!-- RECIPIENTS -->
         <tr>
             <td>
-                <div class="recipient-container" id="group2group1group1group2group2" onclick="toggleRecipient(this)">
+                <div class="recipient-container" id="group2group1group2group2" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide">John Smith</div>
                 </div>
                 <div class="email-address">johnny9878@gmail.com</div>
@@ -97,7 +97,7 @@
 
         <tr>
             <td>
-                <div class="recipient-container"  id="group2group1group1group2group3" onclick="toggleRecipient(this)">
+                <div class="recipient-container"  id="group2group1group2group3" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide">Sally Fields</div>
                 </div>
                 <div class="email-address">sally.fields@gmail.com</div>
@@ -106,7 +106,7 @@
         
         <tr>
             <td>
-                <div class="recipient-container" id="group2group1group1group2group4" onclick="toggleRecipient(this)">
+                <div class="recipient-container" id="group2group1group2group4" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide" >Joe Brown</div>
                 </div>
                 <div class="email-address">joe_brown@gmail.com</div>
@@ -115,7 +115,7 @@
         
         <tr>
             <td>
-                <div class="recipient-container" id="group2group1group1group2group5" onclick="toggleRecipient(this)">
+                <div class="recipient-container" id="group2group1group2group5" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide">owen_thomas@gmail.com</div>
                 </div>
                 <div class="email-address"></div>
@@ -125,7 +125,7 @@
         <!-- NEXT -->
         <tr>
             <td>
-                <div id="group2group1group1group2group6" class="seeNextRecip hide" onclick="cycleRecipients(1)">
+                <div id="group2group1group2group6" class="seeNextRecip hide" onclick="cycleRecipients(1)">
                     <img src="/media/arrow_down.png">
                 </div>
     		</td>
@@ -133,17 +133,16 @@
     </table>
 
     <!-- SUBJECT -->
-    <table class="compose-table requiresKeyboard" id="group2group1group2">
+    <table class="compose-table requiresKeyboard writeSubjectDiv" id="group2group2">
         <tr>
             <td class="left-col"><span class="label label-default">Subject</span></td>
             <td><textarea class="textBox" id="subjectText"></textarea></td>
         </tr>
     </table>
-</div> <!-- end group2group1 -->
 
 
 <!-- WRITE MESSAGE BODY-->
-<div id="group2group2" class="requiresKeyboard">
+<div id="group2group3" class="requiresKeyboard writeMessageDiv white-border">
     <textarea id="write" class="textBox scrollableText" rows="10" cols="20"></textarea>
 </div>
 
