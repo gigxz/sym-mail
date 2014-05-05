@@ -29,8 +29,15 @@ $(window).load(function() {
 	}
 
 	$("#write").on('change keyup paste', function() {
+		console.log("write");
     	showHideScrollArrows();
 	});
+
+    $("#group2group1group1group1").on('change keyup paste', function() {
+		console.log("keyup");
+        this.style.height = 0;
+        this.style.height = this.scrollHeight + 'px';
+    });
 });
 
 
@@ -201,3 +208,4 @@ function cycleRecipients(dir) {
         // see next 4
     }
 }
+
