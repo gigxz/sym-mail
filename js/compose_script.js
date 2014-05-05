@@ -199,7 +199,7 @@ function toggleRecipient(obj) {
 			recipString += ", ";
 		}
 	}
-	$('#group2group1group1group1').text(recipString);
+	$('#toTextArea').text(recipString);
 	//TODO resize if there is overflow
 }
 
