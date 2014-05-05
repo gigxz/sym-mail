@@ -11,7 +11,7 @@ window.addEventListener('load', function(){
         //maxPages = totalNumber/6;
         replaceBoxMessages(data);
         setPageIndicator();
-        showHideNavigationArrows();
+        //showHideNavigationArrows();
     });
 }, false);
 
@@ -31,6 +31,7 @@ function get_box_data(callback) {
 /* GET DATA ON A SPECIFIC PAGE */
 function get_box_data_page(pgNum, callback) {
     var box = 'http://localhost:8080/getemails/' + meta('boxname')+'/'+pgNum;
+    console.log("REQUESTING PAGE "+pgNum);
     make_request(box, function(e) {
         if (this.status == 200) {       
             var content = this.responseText;
@@ -56,7 +57,7 @@ function scrollBox(dir) {
             //maxPages = totalNumber/6;
             replaceBoxMessages(data);
             setPageIndicator();
-            showHideNavigationArrows();
+            //showHideNavigationArrows();
         });
     }
 
@@ -66,9 +67,10 @@ function scrollBox(dir) {
         get_box_data_page(pageNumber, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
+            console.log("CALLING PAGE DOWN");
             replaceBoxMessages(data);
             setPageIndicator();
-            showHideNavigationArrows();
+            //showHideNavigationArrows();
         });
     }
 }
