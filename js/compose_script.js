@@ -111,7 +111,7 @@ function saveDraft(msg){
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value
     }));
-    swindow.location.href = "http://localhost:8080/inbox";
+    window.location.href = "http://localhost:8080/inbox";
 }
 
 

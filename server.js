@@ -101,7 +101,7 @@ function sendmail(message){
   });
 }
 
-app.post('/save', function(request, response){
+function saveDrafts(request){
   imap = new Imap({
       user: 'speakyourmail@gmail.com',
       password: 'testPassword',  host: 'imap.gmail.com',
@@ -109,9 +109,57 @@ app.post('/save', function(request, response){
       tls: true
     });
 
+  console.log('calling save');
+
   imap.once('ready', function(){
     console.log("imap ready");
-    openEmailBox('INBOX', function(){
+    openEmailBox('INBOX', function(e){
+      var mailcomposer = new MailComposer(); 
+
+      mailcomposer.setMessageOption({
+        from: "speakyourmail@gmail.com", 
+        to: request.body.toText, 
+        subject: request.body.subjectText, 
+        body: request.body.bodyText
+      })
+
+      var emailString = mailcomposer.buildMessage(function(err, messageSource){
+        console.log("problem is probs with append");
+        imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
+          if (err) {
+              console.log("append error in save: " + err);
+          }
+          console.log("trying to append");
+          imap.end();
+        }); 
+      });
+    })
+  })
+  imap.once('error', function(e){
+      console.log("error in imap in save: " + e); 
+      saveDrafts(request);
+      
+  });
+  imap.once('end', function(){
+      console.log("saved draft");
+  });  
+  imap.connect(); 
+}
+
+app.post('/save', function(request, response){
+  //saveDrafts(request);
+  imap = new Imap({
+      user: 'speakyourmail@gmail.com',
+      password: 'testPassword',  host: 'imap.gmail.com',
+      port: 993,
+      tls: true
+    });
+
+  console.log('calling save');
+
+  imap.once('ready', function(){
+    console.log("imap ready");
+    openEmailBox('INBOX', function(e){
       var mailcomposer = new MailComposer(); 
 
       mailcomposer.setMessageOption({
@@ -135,10 +183,12 @@ app.post('/save', function(request, response){
   })
   imap.once('error', function(e){
       console.log("error in imap in save: " + e); 
+
   });
   imap.once('end', function(){
       console.log("saved draft");
   });  
+  imap.connect(); 
 }); 
 
 app.post('/sendmail', function(request, response) {
