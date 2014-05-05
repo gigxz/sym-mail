@@ -27,21 +27,21 @@ $(window).load(function() {
 	else {
 		$('#pathHeader').text('Compose');
 	}
+	$("#write").on('change keyup paste', function() {
+		showHideScrollArrows();
+	});
+
+	$('#hideKeyboard').on('click', function() {
+
+	});
+
+	$("#toTextArea").on('change keyup paste', function() {
+	    this.style.height = 0;
+	    this.style.height = this.scrollHeight + 'px';
+	});
 });
 
-$("#write").on('change keyup paste', function() {
-	showHideScrollArrows();
-});
 
-$('#hideKeyboard').on('click', function() {
-
-});
-
-$("#group2group1group1group1").on('change keyup paste', function() {
-	console.log("keyup");
-    this.style.height = 0;
-    this.style.height = this.scrollHeight + 'px';
-});
 
 
 
@@ -53,7 +53,9 @@ function get_reply_data(callback) {
 			var data = JSON.parse(content);
 
 			$("#from").html();
-			$("#to").html(data[0].from);
+			$("#toTextArea").html(data[0].from);
+			console.log(data[0]);
+			new Recipient(data[0].from, addr)
 			$("#subjectText").html("Re: " + data[0].subject);
    //         //TODO get plain text, put in box	
    //         
@@ -231,6 +233,7 @@ function expandKeyboard(textAreaID){
 
     if(textAreaID === "write") {
         $('.writeSubjectDiv').addClass('hide');
+		$('.writeRecipientDiv').addClass('hide');
     }
     if(textAreaID === "subjectText" || textAreaID === "toTextArea") {
         $('.writeMessageDiv').addClass('hide');
@@ -249,6 +252,7 @@ function hideKeyboard() {
     if (!$('#keyboardFrame').hasClass("hide")){
         $('.writeMessageDiv').removeClass('hide');
         $('.writeSubjectDiv').removeClass('hide');
+		$('.writeRecipientDiv').removeClass('hide');
         
         $('#keyboardFrame').addClass("hide");
         $('#keyboardFrame').removeAttr('name'); 
