@@ -4,19 +4,14 @@ var pageNumber,
 
 window.addEventListener('load', function(){
     pageNumber = 1;
-    maxPages = 5; //TODO
+    maxPages = 100; //TODO
 
-    get_box_data(function(data) {
+    get_box_data_page(pageNumber, function(data) {
         //totalNumber = data.total;
         //maxPages = totalNumber/6;
-        if(data.length>0) {
-            replaceBoxMessages(data);
-        }
-        else {
-            console.log("ALERT no messages to show");
-        }
+        replaceBoxMessages(data);
         setPageIndicator();
-        showHideNavigationArrows();
+        //showHideNavigationArrows();
     });
 }, false);
 
@@ -36,6 +31,7 @@ function get_box_data(callback) {
 /* GET DATA ON A SPECIFIC PAGE */
 function get_box_data_page(pgNum, callback) {
     var box = 'http://localhost:8080/getemails/' + meta('boxname')+'/'+pgNum;
+    console.log("REQUESTING PAGE "+pgNum);
     make_request(box, function(e) {
         if (this.status == 200) {       
             var content = this.responseText;
@@ -59,9 +55,10 @@ function scrollBox(dir) {
         get_box_data_page(pageNumber, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
+            console.log("CALLING PAGE UP");
             replaceBoxMessages(data);
             setPageIndicator();
-            showHideNavigationArrows();
+            //showHideNavigationArrows();
         });
     }
 
@@ -71,9 +68,10 @@ function scrollBox(dir) {
         get_box_data_page(pageNumber, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
+            console.log("CALLING PAGE DOWN");
             replaceBoxMessages(data);
             setPageIndicator();
-            showHideNavigationArrows();
+            //showHideNavigationArrows();
         });
     }
 }
@@ -85,7 +83,7 @@ function readEmail(inboxmsg) {
 
 /* given a list of 6 new messages, replace what's visible in the inbox */
 function replaceBoxMessages(newMessages) {
-	//alert("Replace Inbox Messages");
+    //alert("Replace Inbox Messages");
     $('.inboxmsg').each(function(index, obj) {
         $(this).attr('uid', newMessages[index].uid);
 
@@ -100,7 +98,8 @@ function replaceBoxMessages(newMessages) {
         $(this).find('.timestamp').text(getFormattedDate(timestamp));
 
         // replace message
-        $(this).find('.message').text(newMessages[index].message);
+        var htmlMSG = newMessages[index].message;
+        $(this).find('.message').text($.trim(htmlMSG));
     });
 }
 

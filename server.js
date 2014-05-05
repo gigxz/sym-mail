@@ -1,4 +1,6 @@
 var escapeHTML = require('escape-html');
+var MailComposer = require("mailcomposer").MailComposer;
+
 var express = require('express');
 var anyDB = require('any-db');
 var MailParser = require('mailparser').MailParser;
@@ -99,6 +101,96 @@ function sendmail(message){
   });
 }
 
+function saveDrafts(request){
+  imap = new Imap({
+      user: 'speakyourmail@gmail.com',
+      password: 'testPassword',  host: 'imap.gmail.com',
+      port: 993,
+      tls: true
+    });
+
+  console.log('calling save');
+
+  imap.once('ready', function(){
+    console.log("imap ready");
+    openEmailBox('INBOX', function(e){
+      var mailcomposer = new MailComposer(); 
+
+      mailcomposer.setMessageOption({
+        from: "speakyourmail@gmail.com", 
+        to: request.body.toText, 
+        subject: request.body.subjectText, 
+        body: request.body.bodyText
+      })
+
+      var emailString = mailcomposer.buildMessage(function(err, messageSource){
+        console.log("problem is probs with append");
+        imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
+          if (err) {
+              console.log("append error in save: " + err);
+          }
+          console.log("trying to append");
+          imap.end();
+        }); 
+      });
+    })
+  })
+  imap.once('error', function(e){
+      console.log("error in imap in save: " + e); 
+      saveDrafts(request);
+      
+  });
+  imap.once('end', function(){
+      console.log("saved draft");
+  });  
+  imap.connect(); 
+}
+
+app.post('/save', function(request, response){
+  //saveDrafts(request);
+  imap = new Imap({
+      user: 'speakyourmail@gmail.com',
+      password: 'testPassword',  host: 'imap.gmail.com',
+      port: 993,
+      tls: true
+    });
+
+  console.log('calling save');
+
+  imap.once('ready', function(){
+    console.log("imap ready");
+    openEmailBox('INBOX', function(e){
+      var mailcomposer = new MailComposer(); 
+
+      mailcomposer.setMessageOption({
+        from: "speakyourmail@gmail.com", 
+        to: request.body.toText, 
+        subject: request.body.subjectText, 
+        body: request.body.bodyText
+      })
+
+      var emailString = mailcomposer.buildMessage(function(err, messageSource){
+        console.log("problem is probs with append");
+        imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
+          if (err) {
+              console.log("append error in save: " + err);
+          }
+          console.log("trying to append");
+          imap.end(); 
+        }); 
+      });
+    })
+  })
+  imap.once('error', function(e){
+      console.log("error in imap in save: " + e); 
+
+  });
+  imap.once('end', function(){
+      console.log("saved draft");
+  });  
+  imap.connect(); 
+}); 
+
 app.post('/sendmail', function(request, response) {
   //console.log(request.body.subjectText + ' ' + request.body.toText + ' ' + request.body.fromText)
   // Create a SMTP transport object
@@ -110,7 +202,7 @@ app.post('/sendmail', function(request, response) {
       from: from,
 
       // Comma separated list of recipients
-      to: request.body.toText,
+      to: request.body.toText, 
 
       // Subject of the message
       subject: request.body.subjectText, //
@@ -145,14 +237,14 @@ app.get('/addressBook/:offset', function(request, response){
   var myEmail = "speakyourmail@gmail.com";
   q = conn.query(getMostCommonAddresses, [myEmail, 4, offset], function(err, result){
     result.rows.forEach(function(row){
-      contacts += '{"email": "' + row.recipientEmail + '",  "nickname": "' + row.recipientNickname + '"},'; 
+        var nickname = row.recipientNickname; 
+        contacts += '{"email": "' + row.recipientEmail + '",  "nickname": "' + row.recipientNickname + '"},'; 
     }); 
   });
 
   q.on('end', function(){
     contacts = contacts.slice(0, -1); 
     contacts += ']}'
-    console.log(contacts);
     response.json(JSON.parse(contacts)); 
     conn.end();     
     conn = anyDB.createConnection('sqlite3://addressBook.db');
@@ -212,7 +304,7 @@ app.get('/mailboxes', function(request, response) {
 function openEmailBox(box, cb) {
   imap.openBox(box, false, cb);
   imap.once('error', function(e){
-    console.log("open email box, line 215. " + e); 
+    console.log("open email box, line 257. " + e); 
     openEmailBox(box,cb);
   });
 }
@@ -281,9 +373,10 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
           	var mailparser = new MailParser();
           		mailparser.on('end', function(mail_object) {
         				text =  mail_object.html;
+						console.log("from address: "+mail_object.from[0].address);
         				messages.unshift({ //insert first
         // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
-        					from: mail_object.from[0].name,
+        					from: mail_object.from[0],
         					subject: mail_object.subject,
         					to: mail_object.to, // a list of 'to' objects (name and address)
         					date: mail_object.date,

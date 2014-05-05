@@ -27,17 +27,17 @@ $(window).load(function() {
 	else {
 		$('#pathHeader').text('Compose');
 	}
+
 });
 
 $("#write").on('change keyup paste', function() {
 	showHideScrollArrows();
 });
 
-// $("#group2group1group1group1").on('change keyup paste', function() {
-// 	console.log("keyup");
-//     this.style.height = 0;
-//     this.style.height = this.scrollHeight + 'px';
-// });
+$("#toTextArea").on('change keyup paste', function() {
+    this.style.height = 0;
+    this.style.height = this.scrollHeight + 'px';
+});
 
 
 
@@ -49,7 +49,11 @@ function get_reply_data(callback) {
 			var data = JSON.parse(content);
 
 			$("#from").html();
-			$("#toTextArea").html(data[0].from);
+
+			$("#toTextArea").html(data[0].from.name);
+			//console.log("from: ");
+			//console.log(data[0].from.name+","+data[0].from.address);
+			recipients.push(new Recipient(data[0].from.name, data[0].from.address));
 			$("#subjectText").html("Re: " + data[0].subject);
 
    			$("#replyText").html(data[0].body);
@@ -82,8 +86,26 @@ function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
         console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
     }); 
-    //window.location.href = document.referrer;
+    window.location.href = document.referrer;
 
+}
+
+function saveDraft(msg){
+	var request = new XMLHttpRequest();
+    url = 'http://localhost:8080/save';
+    request.open('POST', url, true);
+   	request.setRequestHeader('Content-Type', "application/json"); 
+   	var emailString = '';
+   	recipients.forEach(function(x){
+   		emailString += x.email + ','; 
+   	});
+   	emailString = emailString.slice(0,-1);
+    request.send(JSON.stringify({
+    	"toText": emailString,
+    	"subjectText": document.getElementById("subjectText").value,
+    	"bodyText": document.getElementById("write").value
+    }));
+    window.location.href = "http://localhost:8080/inbox";
 }
 
 
@@ -104,11 +126,6 @@ function sendMail(msg){
     }));
     window.location.href = "http://localhost:8080/inbox";
     //return request;
-}
-
-function saveDraft(msg){
-	//TODO
-	//AUTOSAVE AND DRAFT STUFF
 }
 
 
@@ -133,13 +150,25 @@ function expandToSelection(){
 		var count = 0; 
 		var recipient = $( ".recipient" );
 		for (var i = 0; i < recipient.length && i < abook.length; i++) {
-			recipient[i].innerHTML = abook[i]['nickname']; 
+			if (abook[i]['nickname'] != ""){
+				recipient[i].innerHTML = abook[i]['nickname']; 
+			} else {
+				recipient[i].innerHTML = abook[i]['email']; 
+			}
 		};
 
 		var emails = $( ".email-address" ); 
 		for (var i = 0; i < emails.length && i < abook.length; i++) {
-			//console.log(emails[i].innerHTML); 
-			emails[i].innerHTML = abook[i]['email']; 
+// <<<<<<< HEAD
+// 			//console.log(emails[i].innerHTML); 
+ 			emails[i].innerHTML = abook[i]['email']; 
+// =======
+			// if (abook[i]['nickname'] != ""){
+			// 	emails[i].innerHTML = abook[i]['email']; 
+			// } else {
+			// 	emails[i].innerHTML = abook[i]['email']; 
+			// }
+//>>>>>>> 8b84161976328b139dd9fcd65e2c51ac7c13c831
 		};
     }); 
 
@@ -190,8 +219,8 @@ function toggleRecipient(obj) {
 			recipString += ", ";
 		}
 	}
-	$('#group2group1group1group1').text(recipString);
-	//TODO resize if there is overflow
+	$('#toTextArea').text(recipString);
+	$('#toTextArea').change();
 }
 
 function removeRecipient(email) {
@@ -224,6 +253,7 @@ function expandKeyboard(textAreaID){
 
     if(textAreaID === "write") {
         $('.writeSubjectDiv').addClass('hide');
+		$('.writeRecipientDiv').addClass('hide');
     }
     if(textAreaID === "subjectText" || textAreaID === "toTextArea") {
         $('.writeMessageDiv').addClass('hide');
@@ -242,6 +272,7 @@ function hideKeyboard() {
     if (!$('#keyboardFrame').hasClass("hide")){
         $('.writeMessageDiv').removeClass('hide');
         $('.writeSubjectDiv').removeClass('hide');
+		$('.writeRecipientDiv').removeClass('hide');
         
         $('#keyboardFrame').addClass("hide");
         $('#keyboardFrame').removeAttr('name'); 
