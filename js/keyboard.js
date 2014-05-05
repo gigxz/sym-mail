@@ -4,7 +4,8 @@ var keyNumber = 0,
     intervalFunction,    
     waitTime = 1000,
     fontSize,
-    isActive = false;
+    isActive = false,
+    caretPosition;
 
 window.addEventListener('load', function(){
     //TODO set font size ( get it from meta tag )
@@ -14,6 +15,7 @@ window.addEventListener('load', function(){
 }); 
 
 function restartKeyboard() {
+    caretPosition = 0;
     isActive = true;
     keyNumber = 0;
     id = 'key';
@@ -117,7 +119,10 @@ var keyIDexists = function(idToCheck) {
 
 function typeKey(keyID) {
     var textAreaID = window.parent.document.getElementById('keyboardFrame').getAttribute('name');
-    var textarea = window.parent.document.getElementById(textAreaID);
+    var $txtAr = $(window.parent.document.getElementById(textAreaID));
+    $txtAr.selectRange(caretPosition);
+    var textAreaTxt = $txtAr.val();
+
 
 
     var shift = false,
@@ -144,8 +149,12 @@ function typeKey(keyID) {
      
     // Delete
     if ($this.hasClass('delete')) {
-        var len = textarea.value.length;
-        textarea.value = textarea.value.substring(0,len-1);
+        //var len = textarea.value.length;
+        
+        if(caretPosition>0) {
+            $txtAr.val(textAreaTxt.substring(0, caretPosition-1) + textAreaTxt.substring(caretPosition));
+            caretPosition--;
+        }
         return;
     }
      
@@ -163,9 +172,27 @@ function typeKey(keyID) {
         $('.symbol span').toggle();
         if (capslock === false) $('.letter').toggleClass('uppercase');
         shift = false;
+        return;
     }
      
     // Add the character
-    textarea.value = textarea.value + character;
+    $txtAr.val(textAreaTxt.substring(0, caretPosition) + character + textAreaTxt.substring(caretPosition));
+    caretPosition++;
 }
+
+$.fn.selectRange = function(start, end) {
+    if(!end) end = start; 
+    return this.each(function() {
+        if (this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if (this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+};
 

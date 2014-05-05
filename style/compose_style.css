@@ -65,16 +65,13 @@ table.compose-table td {
 	margin-top: 28px;
 }
 
-#keyboardContainer {
-
-}
 
 /* IFRAME */
 #keyboardFrame {
 	width:37.6em;
 	height:13em;
 	overflow:hidden;
-	margin-left:8em;
+	margin-left:10px;
 }
 
 
@@ -99,12 +96,11 @@ table.compose-table td {
 	color:white;
 	background-color: rgba(221, 221, 221, .95);
 
-	margin:0 auto;
-
 	border-radius: 3px;
 	box-shadow:3px 10px 20px #575757;
 	z-index:1;
 	position:absolute;
+	left:560px;
 }
 
 .recipient-container {

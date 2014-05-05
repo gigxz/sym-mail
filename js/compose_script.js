@@ -33,15 +33,11 @@ $("#write").on('change keyup paste', function() {
 	showHideScrollArrows();
 });
 
-$('#hideKeyboard').on('click', function() {
-
-});
-
-$("#group2group1group1group1").on('change keyup paste', function() {
-	console.log("keyup");
-    this.style.height = 0;
-    this.style.height = this.scrollHeight + 'px';
-});
+// $("#group2group1group1group1").on('change keyup paste', function() {
+// 	console.log("keyup");
+//     this.style.height = 0;
+//     this.style.height = this.scrollHeight + 'px';
+// });
 
 
 
@@ -53,12 +49,9 @@ function get_reply_data(callback) {
 			var data = JSON.parse(content);
 
 			$("#from").html();
-			$("#to").html(data[0].from);
+			$("#toTextArea").html(data[0].from);
 			$("#subjectText").html("Re: " + data[0].subject);
-   //         //TODO get plain text, put in box	
-   //         
-   			console.log("REPLYING TO ");
-   			//console.log(data[0].body);
+
    			$("#replyText").html(data[0].body);
 
 			var plainText = jQuery('<div>').html(data[0].body).text();
@@ -133,10 +126,10 @@ function expandToSelection(){
 	url = 'http://localhost:8080/addressBook/' + offset; 
     make_request(url, function(e) {
     	var content = this.responseText; 
-		console.log(content);
+		//console.log(content);
 		var abook = JSON.parse(content); 
 		abook = abook['contacts'];
-		console.log(abook)
+		//console.log(abook)
 		var count = 0; 
 		var recipient = $( ".recipient" );
 		for (var i = 0; i < recipient.length && i < abook.length; i++) {
@@ -145,7 +138,7 @@ function expandToSelection(){
 
 		var emails = $( ".email-address" ); 
 		for (var i = 0; i < emails.length && i < abook.length; i++) {
-			console.log(emails[i].innerHTML); 
+			//console.log(emails[i].innerHTML); 
 			emails[i].innerHTML = abook[i]['email']; 
 		};
     }); 
@@ -259,3 +252,18 @@ function hideKeyboard() {
     }
 }
 
+$.fn.selectRange = function(start, end) {
+    if(!end) end = start; 
+    return this.each(function() {
+        if (this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if (this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+};
