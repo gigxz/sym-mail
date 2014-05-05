@@ -68,5 +68,6 @@ function get_message_data(callback) {
 
 
 function reply() {
-    window.location.href = '/compose/'+meta('uid');
+    console.log("REPLY! REDIRECTING TO : "+'/compose/'+meta('boxname')+'/'+meta('uid'))
+    window.location.href = '/compose/'+meta('boxname')+'/'+meta('uid');
 }

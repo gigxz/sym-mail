@@ -29,13 +29,13 @@ var Imap = require('imap'),
 /*
 ADDRESS BOOK SQL STUFF!
 */
-var makeAddressBook = "CREATE TABLE IF NOT EXISTS addressBook (clientEmail TEXT, recipientEmail TEXT, recipientNickname TEXT, emailCount INTEGER);";
+var makeAddressBook = "CREATE TABLE IF NOT EXISTS addressBook (clientEmail TEXT, recipientEmail TEXT, recipientNickname TEXT, emailCount INTEGER, PRIMARY KEY (clientEmail, recipientEmail));";
 
 var addAddress = "INSERT INTO addressBook (clientEmail, recipientEmail, recipientNickname, emailCount)" + "VALUES ($1, $2, $3, 1);";
 
 var selectAddress = "SELECT recipientEmail, emailCount FROM addressBook WHERE clientEmail = $1 AND recipientEmail = $2";
 
-var updateAddress = "REPLACE INTO addressBook (clientEmail, reciepientEmail, emailCount) VALUES ($1, $2, $4);";
+var updateAddress = "REPLACE INTO addressBook (clientEmail, recipientEmail, recipientNickname,  emailCount) VALUES ($1, $2, $3, $4);";
 
 var getMostCommonAddresses = "SELECT recipientEmail, recipientNickname FROM addressBook WHERE clientEmail = $1 ORDER BY emailCount DESC LIMIT 6 OFFSET $2;";
 
@@ -45,17 +45,17 @@ conn.query(makeAddressBook);
 function addressBookEntry(clientEmail, recipientEmail, recipientNickname) {
   console.log("addressBook");
   var inDatabase = true; 
-  conn.query(selectAddress, [clientEmail, recipientEmail])
-    .on('row', function(row) {
+  q = conn.query(selectAddress, [clientEmail, recipientEmail]); 
+  q.on('row', function(row) {
      //that row exits so update it and add one to the row's count 
      inDatabase = false;  
-      conn.query(updateAddress, [clientEmail, recipientEmail, recipientNickname, row['emailCount'] + 1])
+      conn.query(updateAddress, [clientEmail, recipientEmail, recipientNickname, 1 + parseInt(row['emailCount']) ]); 
       console.log("updating the address");
       
-    })
-    .on('end', function(){
+    }); 
+  q.on('end', function(){
       if (inDatabase) {
-        conn.query(addAddress, [clientEmail,recipientEmail, recipientNickname]); 
+        conn.query(addAddress, [clientEmail,recipientEmail,recipientNickname]); 
         console.log("added a new address");
       }
     }); 
@@ -124,21 +124,35 @@ app.post('/sendmail', function(request, response) {
 
 }); 
 
+app.get('/testing/:email/:toEmail/:nickname', function(request, response){
+  var fromEmail = request.params.email; 
+  var toEmail = request.params.toEmail; 
+  var nickname = request.params.nickname; 
+  addressBookEntry(fromEmail, toEmail, nickname); 
+  conn.query("SELECT * FROM addressBook;", function(err, res){
+    res.rows.forEach(function(row){
+      console.log("row" + row);
+    }); 
+  });
+}); 
+
 app.get('/addressBook/:offset', function(request, response){
   var offset = request.params.offset; 
   //AUTH!!!! ORIGINAL EMAIL
   var contacts = '{ "contacts": ['; 
   var myEmail = "speakyourmail@gmail.com";
-  conn.query(getMostCommonAddresses, [myEmail, offset], function(err, result){
+  q = conn.query(getMostCommonAddresses, [myEmail, offset], function(err, result){
     result.rows.forEach(function(row){
-      contacts += '{"email": "' + row['recipientEmail'] + '",  "nickname": "' + row['nickname'] + '"},'; 
-      console.log("adress book " + row); 
+      contacts += '{"email": "' + row.recipientEmail + '",  "nickname": "' + row.recipientNickname + '"},'; 
     }); 
   });
 
-  contacts = contacts.slice(0, -1); 
-  contacts += ']}'
-  response.send(contacts); 
+  q.on('end', function(){
+    contacts = contacts.slice(0, -1); 
+    contacts += ']}'
+    console.log(contacts);
+    response.json(JSON.parse(contacts));     
+  }); 
 });
 
 app.post('/login', function(request, response) {
@@ -358,6 +372,8 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
   imap.once('ready', function() {
     openEmailBox(boxname, function(err, box) {
       if (err) throw err;
+
+
 //       var f = imap.seq.fetch(box.messages.total + ':' + (box.messages.total-5), {
 //         bodies: '',
 //         struct: true
@@ -377,7 +393,7 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
         			struct: true
       			});      		
       		}
-      		//TO HERE
+
 
       f.on('message', function(msg, seqno) {
         //console.log('Message #%d', seqno);
@@ -517,23 +533,22 @@ app.get('/box/:boxname', function(request, response) {
 	response.render('box.html', {boxname: boxname});
 });
 
-//TODO linking to inbox from another pg --> there are no messages in it
 app.get('/inbox', function(request, response) {
 	response.render('inbox.html', {boxname: 'INBOX'});
 });
 
-//TODO GET DRAFTS
 app.get('/drafts', function(request, response) {
   response.render('drafts.html', {boxname:'%5BGmail%5D%2FDrafts'});
 });
-/* compose */
 app.get('/compose', function(request, response) {
   response.render('compose.html');
 });
 /* reply */
-app.get('/compose/:uid', function(request, response) {
+app.get('/compose/:boxname/:uid', function(request, response) {
 	var uid = request.params.uid;	
-	response.render('compose.html', {uid: uid});
+  var boxname = request.params.boxname; 
+  console.log("RENDERING REPLY "+boxname+"/"+uid);
+	response.render('compose.html', {boxname: boxname, uid: uid});
 });
 
 app.get('/settings', function(request, response) {

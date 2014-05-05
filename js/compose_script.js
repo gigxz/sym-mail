@@ -1,19 +1,13 @@
 var recipients = [];
 
 /* ON LOAD */
-window.onload = function() {
-	console.log("COMPOSE LOADING");
+$(window).load(function() {
+	console.log("COMPOSE LOADING uid: "+meta('uid'));
 	if(meta('uid')!='') {
 		get_reply_data(function(subjText) {
-			if(subjText) {
-				if(subjText.length > 30) {
-					subjText = subjText.substring(0, 30 + "...");
-				}
+			if(subjText && subjText.length > 30) {
+				subjText = subjText.substring(0, 30 + "...");
 			}
-			showHideScrollArrows();
-
-
-
 			var header = "Inbox";
 	        if(document.referrer.indexOf("drafts") > -1) {
 	            header = "Drafts";
@@ -24,28 +18,38 @@ window.onload = function() {
 	        else {
 	            header += " > Read Message";
 	        }
+	        header += " > Reply";
 	        $('#pathHeader').text(header);
+
+	        showHideScrollArrows();
 		});
 	}
 	else {
 		$('#pathHeader').text('Compose');
 	}
-    
-}
+
+	$("#write").on('change keyup paste', function() {
+    	showHideScrollArrows();
+	});
+});
+
+
 function get_reply_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('uid'), function(e) {
+	//console.log("REQUESTING REPLY DATA FOR  "+meta('boxname')+'/'+meta('uid'));
+    make_request('http://localhost:8080/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
         if (this.status == 200) {    
-            var content = this.responseText;
-            var data = JSON.parse(content);
+			var content = this.responseText;
+			var data = JSON.parse(content);
 
-            $("#from").html();
-            $('#to').html(data[0].from);
-            $("#subjectText").html("Re: " + data[0].subject);
-           //TODO get plain text, put in box	
-           //$("#write").html(data[0].text);
+			$("#from").html();
+			$("#to").html(data[0].from);
+			$("#subjectText").html("Re: " + data[0].subject);
+   //         //TODO get plain text, put in box	
+   //         //$("#write").html(data[0].text);
 
-			callback(data[0].subject);
-        } else {
+			 callback(data[0].subject);
+        }
+        else {
             alert("Feed Request was invalid.");
         }               
     });
@@ -93,12 +97,48 @@ function saveDraft(msg){
 	//AUTOSAVE AND DRAFT STUFF
 }
 
+
 /* recipients obj */
 function Recipient(nickname, email) {
 	this.nickname = nickname;
 	this.email = email;
 }
 
+function expandToSelection(){
+	pageNumber = 0; //this is what page you are on
+
+	var offset = 0 + parseInt(pageNumber);
+	url = 'http://localhost:8080/addressBook/' + offset; 
+    make_request(url, function(e) {
+    	var content = this.responseText; 
+		console.log(content);
+		var abook = JSON.parse(content); 
+		abook = abook['contacts'];
+		console.log(abook)
+		var count = 0; 
+		var recipient = $( ".recipient" );
+		for (var i = 0; i < recipient.length && i < abook.length; i++) {
+			recipient[i].innerHTML = abook[i]['nickname']; 
+		};
+
+		var emails = $( ".email-address" ); 
+		for (var i = 0; i < emails.length && i < abook.length; i++) {
+			console.log(emails[i].innerHTML); 
+			emails[i].innerHTML = abook[i]['email']; 
+		};
+    }); 
+
+    $('#recipientBoxRow').removeClass('hide');
+    // remove hide from all descendants
+    $('#recipientBoxRow').find('.hide').removeClass('hide');
+
+    $('.seePrevRecip').addClass('hide'); //no prevs to start with
+    // set id to id of seePrevRecip
+    var newID = $('.seePrevRecip').attr('id');
+    newID = newID.substring(0, newID.length-1);
+    id = newID;
+    groupNumber = 0;
+}
 
 function goBackClicked() {
     // if recipients are visible, hide
