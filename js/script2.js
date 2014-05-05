@@ -21,6 +21,7 @@ window.addEventListener('load', function(){
 function cyclingOn(num) {
     if(num===1) {
         // turn on
+        console.log("RESTARTING CYCLING");
         clearInterval(intervalFunction); // just in case
         groupNumber = 0;
         id = 'group';
@@ -101,9 +102,12 @@ var clickHandler = function() {
                         else {
                             //CLICK ON ITEM
                             //TODO FIX THIS BUG WTF
-                            if(groupNumber===0)
-                                 groupNumber=1;
-                            document.getElementById(id+groupNumber).click();
+                            if(elementExists(id+groupNumber)) {
+                                document.getElementById(id+groupNumber).click();
+                            }
+                            else {
+                                console.log("WHAAaaaaaaAAAt");
+                            }
                         } 
                     
                         intervalFunction = setInterval(cycle, waitTime);     
@@ -175,20 +179,17 @@ function expandKeyboard(){
     if ($('#keyboardFrame').hasClass("hide") ){
         cyclingOn(0); // TURN OFF CYCLING
         $('#keyboardFrame').removeClass("hide");
+        $('#keyboardFrame').attr('src', '/keyboard');
         document.getElementById("keyboardFrame").contentWindow.focus();
-        document.getElementById("keyboardFrame").contentWindow.restartKeyboard();
     }
 }
 function hideKeyboard() {
     if (!$('#keyboardFrame').hasClass("hide")){
         $('#keyboardFrame').addClass("hide");
         cyclingOn(1); // TURN ON CYCLING
+        $(window).focus();
     }
 }
-
-// function expandToSelection(){
-//    console.log("moved to compose_script.js");
-// }
 
 function followLink(pageName) {
     var url = 'http://localhost:8080/'+pageName;

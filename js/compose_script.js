@@ -1,14 +1,13 @@
 var recipients = [];
 
 /* ON LOAD */
-window.onload = function() {
-	console.log("COMPOSE LOADING");
+$(window).load(function() {
+	console.log("COMPOSE LOADING uid: "+meta('uid'));
 	if(meta('uid')!='') {
 		get_reply_data(function(subjText) {
 			if(subjText && subjText.length > 30) {
 				subjText = subjText.substring(0, 30 + "...");
 			}
-			
 			var header = "Inbox";
 	        if(document.referrer.indexOf("drafts") > -1) {
 	            header = "Drafts";
@@ -32,9 +31,11 @@ window.onload = function() {
 	$("#write").on('change keyup paste', function() {
     	showHideScrollArrows();
 	});
-}
+});
+
+
 function get_reply_data(callback) {   
-	console.log("REQUESTING REPLY DATA FOR  "+meta('boxname')+'/'+meta('uid'));
+	//console.log("REQUESTING REPLY DATA FOR  "+meta('boxname')+'/'+meta('uid'));
     make_request('http://localhost:8080/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
         if (this.status == 200) {    
 			var content = this.responseText;
