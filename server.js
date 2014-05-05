@@ -323,9 +323,10 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
           	var mailparser = new MailParser();
           		mailparser.on('end', function(mail_object) {
         				text =  mail_object.html;
+						console.log("from address: "+mail_object.from[0].address);
         				messages.unshift({ //insert first
         // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
-        					from: mail_object.from[0].name,
+        					from: mail_object.from[0],
         					subject: mail_object.subject,
         					to: mail_object.to, // a list of 'to' objects (name and address)
         					date: mail_object.date,
