@@ -99,11 +99,7 @@ function replaceBoxMessages(newMessages) {
 
         // replace message
         var htmlMSG = newMessages[index].message;
-        var $stringHolder = $(htmlMSG);
-        var textonly = $stringHolder.text();
-       // console.log("TEXT ONLY: "+textonly);
-
-        $(this).find('.message').text(htmlMSG);
+        $(this).find('.message').text($.trim(htmlMSG));
     });
 }
 
