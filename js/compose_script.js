@@ -82,6 +82,24 @@ function deleteMessage(inboxmsg) {
 
 }
 
+function saveDraft(msg){
+	var request = new XMLHttpRequest();
+    url = 'http://localhost:8080/save';
+    request.open('POST', url, true);
+   	request.setRequestHeader('Content-Type', "application/json"); 
+   	var emailString = '';
+   	recipients.forEach(function(x){
+   		emailString += x.email + ','; 
+   	});
+   	emailString = emailString.slice(0,-1);
+    request.send(JSON.stringify({
+    	"toText": emailString,
+    	"subjectText": document.getElementById("subjectText").value,
+    	"bodyText": document.getElementById("write").value
+    }));
+    //window.location.href = "http://localhost:8080/inbox";
+}
+
 
 function sendMail(msg){
     var request = new XMLHttpRequest();
@@ -100,11 +118,6 @@ function sendMail(msg){
     }));
     window.location.href = "http://localhost:8080/inbox";
     //return request;
-}
-
-function saveDraft(msg){
-	//TODO
-	//AUTOSAVE AND DRAFT STUFF
 }
 
 
@@ -129,13 +142,20 @@ function expandToSelection(){
 		var count = 0; 
 		var recipient = $( ".recipient" );
 		for (var i = 0; i < recipient.length && i < abook.length; i++) {
-			recipient[i].innerHTML = abook[i]['nickname']; 
+			if (abook[i]['nickname'] != ""){
+				recipient[i].innerHTML = abook[i]['nickname']; 
+			} else {
+				recipient[i].innerHTML = abook[i]['email']; 
+			}
 		};
 
 		var emails = $( ".email-address" ); 
 		for (var i = 0; i < emails.length && i < abook.length; i++) {
-			console.log(emails[i].innerHTML); 
-			emails[i].innerHTML = abook[i]['email']; 
+			if (abook[i]['nickname'] != ""){
+				emails[i].innerHTML = abook[i]['email']; 
+			} else {
+				emails[i].innerHTML = abook[i]['email']; 
+			}
 		};
     }); 
 
