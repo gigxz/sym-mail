@@ -11,6 +11,7 @@ window.addEventListener('load', function(){
     fontSize='18'; //default
     isActive = true;
     addKeyStyles();
+    restartKeyboard();
 }); 
 
 function restartKeyboard() {
