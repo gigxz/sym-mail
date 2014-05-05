@@ -9,7 +9,6 @@ var keyNumber = 0,
 window.addEventListener('load', function(){
     //TODO set font size ( get it from meta tag )
     fontSize='18'; //default
-    isActive = true;
     addKeyStyles();
     restartKeyboard();
 }); 
@@ -71,17 +70,10 @@ function keyboardCycling() {
                     } 
                     else {
                         // CLICK ON ITEM
-                        console.log("KEYBOARD: clicking on "+id+keyNumber);
-                        //document.getElementById(id+keyNumber).click();
-                        //TODO send letter to parent
                         typeKey(id+keyNumber);
                     }  
                     intervalFunction = setInterval(cycle, waitTime);  
                 }
-
-                
-
-                console.log("CLICK IN KEYBOARD: "+id+keyNumber);
            }
         });
 };
@@ -124,14 +116,15 @@ var keyIDexists = function(idToCheck) {
 }
 
 function typeKey(keyID) {
+    var textAreaID = window.parent.document.getElementById('keyboardFrame').getAttribute('name');
+    var textarea = window.parent.document.getElementById(textAreaID);
+
+
     var shift = false,
         capslock = false;
      
     var $this = $('#'+keyID+' li');
     var character = $this.html(); // If it's a lowercase letter, nothing happens to this variable
-
-    // the textarea to modify
-    var writeTextArea = window.parent.document.getElementById('write');
 
     // Shift key
     if ($this.hasClass('left-shift')) {
@@ -151,8 +144,8 @@ function typeKey(keyID) {
      
     // Delete
     if ($this.hasClass('delete')) {
-        var len = writeTextArea.value.length;
-        writeTextArea.value = writeTextArea.value.substring(0,len-1);
+        var len = textarea.value.length;
+        textarea.value = textarea.value.substring(0,len-1);
         return;
     }
      
@@ -173,6 +166,6 @@ function typeKey(keyID) {
     }
      
     // Add the character
-    writeTextArea.value = writeTextArea.value + character;
+    textarea.value = textarea.value + character;
 }
 

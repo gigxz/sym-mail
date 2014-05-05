@@ -4,10 +4,13 @@
 	float: left;
 	display: block;
 	margin-top:10px;
-/*	height: 490px;
-*/	width: 680px;
+	width: 680px;
 	margin-left: 20px;
 	border: 2px solid white;
+}
+
+.firstButtonGroup {
+	padding:2px;
 }
 table.compose-table {
 	width:100%;
@@ -55,11 +58,11 @@ table.compose-table td {
 /* email body textarea */
 #write {
 	height: 300px;
-	width: 670px;
+	overflow-x:hidden;
 }
 
 #goBack {
-	margin-top: 10px;
+	margin-top: 28px;
 }
 
 #keyboardContainer {
@@ -68,7 +71,7 @@ table.compose-table td {
 
 /* IFRAME */
 #keyboardFrame {
-	width:40em;
+	width:37.6em;
 	height:13em;
 	overflow:hidden;
 	margin-left:8em;

@@ -6,6 +6,7 @@ var groupNumber = 0,
     fontSize;
 
 window.addEventListener('load', function(){
+    $(window).focus();
     //set font size
     fontSize = getQueryVariable(window.location.search, 'size');
     if(fontSize==='')
@@ -90,7 +91,7 @@ var clickHandler = function() {
                 }
                 else {
                     if ($('#'+id+groupNumber).hasClass('requiresKeyboard')){
-                        expandKeyboard();
+                        expandKeyboard($('#'+id+groupNumber).find('textarea').attr('id'));
                     }
                     else {
                         // if one level down exists AND is not hidden
@@ -174,22 +175,6 @@ var cycle = function () {
     animate(stringGroup);
 }
 
-
-function expandKeyboard(){
-    if ($('#keyboardFrame').hasClass("hide") ){
-        cyclingOn(0); // TURN OFF CYCLING
-        $('#keyboardFrame').removeClass("hide");
-        $('#keyboardFrame').attr('src', '/keyboard');
-        document.getElementById("keyboardFrame").contentWindow.focus();
-    }
-}
-function hideKeyboard() {
-    if (!$('#keyboardFrame').hasClass("hide")){
-        $('#keyboardFrame').addClass("hide");
-        cyclingOn(1); // TURN ON CYCLING
-        $(window).focus();
-    }
-}
 
 function followLink(pageName) {
     var url = 'http://localhost:8080/'+pageName;

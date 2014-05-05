@@ -4,7 +4,7 @@ var pageNumber,
 
 window.addEventListener('load', function(){
     pageNumber = 1;
-    maxPages = 5; //TODO
+    maxPages = 100; //TODO
 
     get_box_data_page(pageNumber, function(data) {
         //totalNumber = data.total;
@@ -50,12 +50,12 @@ function setPageIndicator() {
 
 function scrollBox(dir) {
     // page up
-    alert(dir);
     if(dir===1) {
         pageNumber--;
         get_box_data_page(pageNumber, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
+            console.log("CALLING PAGE UP");
             replaceBoxMessages(data);
             setPageIndicator();
             //showHideNavigationArrows();
@@ -98,7 +98,8 @@ function replaceBoxMessages(newMessages) {
         $(this).find('.timestamp').text(getFormattedDate(timestamp));
 
         // replace message
-        $(this).find('.message').text(newMessages[index].message);
+        var htmlMSG = newMessages[index].message;
+        $(this).find('.message').text($.trim(htmlMSG));
     });
 }
 

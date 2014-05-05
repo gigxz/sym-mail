@@ -27,18 +27,22 @@ $(window).load(function() {
 	else {
 		$('#pathHeader').text('Compose');
 	}
-
-	$("#write").on('change keyup paste', function() {
-		console.log("write");
-    	showHideScrollArrows();
-	});
-
-    $("#group2group1group1group1").on('change keyup paste', function() {
-		console.log("keyup");
-        this.style.height = 0;
-        this.style.height = this.scrollHeight + 'px';
-    });
 });
+
+$("#write").on('change keyup paste', function() {
+	showHideScrollArrows();
+});
+
+$('#hideKeyboard').on('click', function() {
+
+});
+
+$("#group2group1group1group1").on('change keyup paste', function() {
+	console.log("keyup");
+    this.style.height = 0;
+    this.style.height = this.scrollHeight + 'px';
+});
+
 
 
 function get_reply_data(callback) {   
@@ -52,9 +56,16 @@ function get_reply_data(callback) {
 			$("#to").html(data[0].from);
 			$("#subjectText").html("Re: " + data[0].subject);
    //         //TODO get plain text, put in box	
-   //         //$("#write").html(data[0].text);
+   //         
+   			console.log("REPLYING TO ");
+   			//console.log(data[0].body);
+   			$("#replyText").html(data[0].body);
 
-			 callback(data[0].subject);
+			var plainText = jQuery('<div>').html(data[0].body).text();
+
+			$('#write').val('\n\n\n-----\n'+plainText);
+			$('#write').selectRange(0);
+			callback(data[0].subject);
         }
         else {
             alert("Feed Request was invalid.");
@@ -229,6 +240,42 @@ function cycleRecipients(dir) {
     }
     else if(dir === 1) {
         // see next 4
+    }
+}
+
+
+/**** KEYBOARD ****/
+
+function expandKeyboard(textAreaID){
+    console.log('EXPANDING KEYBOARD FOR '+textAreaID);
+
+    if(textAreaID === "write") {
+        $('.writeSubjectDiv').addClass('hide');
+    }
+    if(textAreaID === "subjectText" || textAreaID === "toTextArea") {
+        $('.writeMessageDiv').addClass('hide');
+    }
+
+    if ($('#keyboardFrame').hasClass("hide") ){
+        cyclingOn(0); // TURN OFF CYCLING
+        $('#keyboardFrame').removeClass("hide");
+        $('#keyboardFrame').attr('name', textAreaID); // tell keyboard where to type
+        $('#keyboardFrame').attr('src', '/keyboard');
+        document.getElementById("keyboardFrame").contentWindow.focus();
+    }
+}
+function hideKeyboard() {
+
+    if (!$('#keyboardFrame').hasClass("hide")){
+        $('.writeMessageDiv').removeClass('hide');
+        $('.writeSubjectDiv').removeClass('hide');
+        
+        $('#keyboardFrame').addClass("hide");
+        $('#keyboardFrame').removeAttr('name'); 
+        $('#keyboardFrame').removeAttr('src');
+        $('#keyboardFrame').click();
+        cyclingOn(1); // TURN ON CYCLING
+        $(window).focus();
     }
 }
 

@@ -552,11 +552,10 @@ app.get('/drafts', function(request, response) {
 app.get('/compose', function(request, response) {
   response.render('compose.html');
 });
-/* reply */
+
 app.get('/compose/:boxname/:uid', function(request, response) {
 	var uid = request.params.uid;	
   var boxname = request.params.boxname; 
-  console.log("RENDERING REPLY "+boxname+"/"+uid);
 	response.render('compose.html', {boxname: boxname, uid: uid});
 });
 
