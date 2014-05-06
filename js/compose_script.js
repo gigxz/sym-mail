@@ -159,14 +159,14 @@ function expandToSelection(num){
 	url = 'http://localhost:8080/addressBook/' + offset; 
     make_request(url, function(e) {
     	var content = this.responseText; 
-		console.log(content);
+		//console.log(content);
 		var abook = JSON.parse(content); 
 		abook = abook['contacts'];
 		//console.log(abook)
 		var count = 0; 
 		var recipient = $( ".recipient" );
 		if (abook.length<recipient.length){
-			console.log("need to hide");
+			//console.log("need to hide");
 			$(".recipient-container:last").addClass('hide');
 			$(".email-address:last").addClass('hide');
 			$('.seeNextRecip').addClass('hide');
