@@ -4,17 +4,6 @@
     <meta name="boxname" content="{{boxname}}">
     <meta charset="UTF-8">
     <title>{{boxname}}</title>
-<!-- 
-    <link rel="stylesheet" href="../bootstrap/css/bootstrap.css" type="text/css" />
-    <link rel="stylesheet" href="style/inbox_style.css" type="text/css" />
-    <link rel="stylesheet" href="style/main_style.css" type="text/css" />
-
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-    <script type="text/javascript" src="js/script2.js"></script>
-    <script type="text/javascript" src="js/inbox_script.js"></script>
- -->
- 
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="/style/inbox_style.css" type="text/css" />
     <link rel="stylesheet" href="/style/main_style.css" type="text/css" />
@@ -22,11 +11,13 @@
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
-    <script type="text/javascript" src="/js/inbox_script.js"></script>
-    <!--<script type="text/javascript" src="/js/drafts_script.js"></script> -->
+    <script type="text/javascript" src="/js/box_script.js"></script>
+    <script type="text/javascript" src="/js/drafts_script.js"></script>
 
 </head>
 <body>
+<div id="loadingScreen"></div>
+
 <!-- MAIN DIV -->
 <div id="group">
 <div id="pathHeader">Drafts
@@ -63,7 +54,7 @@
 
 <div id="group2group1" class="white-border"> <!-- start first half -->
 <!--     message 1     -->
-    <div class="inboxmsg" id="group2group1group1" onclick="readEmail(this)">
+    <div class="inboxmsg" id="group2group1group1" onclick="openDraft(this)">
         
         <table class="table">
         <tbody>
@@ -81,7 +72,7 @@
     </div>
     <div class="space"></div>
 <!--     message 2     -->
-    <div class="inboxmsg" id="group2group1group2"  onclick="readEmail(this)">
+    <div class="inboxmsg" id="group2group1group2" onclick="openDraft(this)">
     
         <table class="table">
         <tbody>
@@ -99,7 +90,7 @@
     </div>
     <div class="space"></div>
 <!--     message 3     -->
-    <div class="inboxmsg" id="group2group1group3"  onclick="readEmail(this)">
+    <div class="inboxmsg" id="group2group1group3" onclick="openDraft(this)">
     
         <table class="table">
         <tbody>
@@ -126,7 +117,7 @@
 <div id="group2group2" class="white-border"> <!-- start second half -->
    
 <!--     message 4     -->
-    <div class="inboxmsg" id="group2group2group1"  onclick="readEmail(this)">
+    <div class="inboxmsg" id="group2group2group1" onclick="openDraft(this)">
     
         <table class="table">
         <tbody>
@@ -144,7 +135,7 @@
     </div>   
     <div class="space"></div>
 <!--     message 5     -->
-    <div class="inboxmsg" id="group2group2group2"  onclick="readEmail(this)">
+    <div class="inboxmsg" id="group2group2group2"  onclick="openDraft(this)">
     
         <table class="table">
         <tbody>
@@ -162,7 +153,7 @@
     </div> 
     <div class="space"></div>
 <!--     message 6     -->
-    <div class="inboxmsg" id="group2group2group3"  onclick="readEmail(this)">
+    <div class="inboxmsg" id="group2group2group3" onclick="openDraft(this)">
     
         <table class="table">
         <tbody>

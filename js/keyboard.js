@@ -60,6 +60,8 @@ function keyboardCycling() {
                         window.parent.document.getElementById('hideKeyboard').click();
                     }
                     else {
+                        keyNumber = 0;
+                        id = 'key';
                         intervalFunction = setInterval(cycle, waitTime);
                     }
                 }
@@ -118,19 +120,26 @@ var keyIDexists = function(idToCheck) {
 }
 
 function typeKey(keyID) {
+//    console.log(keyID);
+    if(keyID.substring(keyID.length-1, keyID.length) === '0') {
+        console.log(keyID);
+        return;
+    }
     var textAreaID = window.parent.document.getElementById('keyboardFrame').getAttribute('name');
     var $txtAr = $(window.parent.document.getElementById(textAreaID));
     $txtAr.selectRange(caretPosition);
     var textAreaTxt = $txtAr.val();
 
-
+    // give focus back to self
+    $(window).focus();
 
     var shift = false,
         capslock = false;
      
     var $this = $('#'+keyID+' li');
+    //console.log($this);
     var character = $this.html(); // If it's a lowercase letter, nothing happens to this variable
-
+    //console.log(character);
     // Shift key
     if ($this.hasClass('left-shift')) {
         $('.letter').toggleClass('uppercase');

@@ -22,6 +22,7 @@
 
 </head>
 <body>
+<div id="loadingScreen"></div>
 
 <!--MAIN DIV-->
 
@@ -59,18 +60,18 @@
 <div id="group2" class="white-border">
 
     <!-- TO field -->
-    <table class="compose-table writeRecipientDiv"  id="group2group1">
+    <table id="group2group1" class="compose-table writeRecipientDiv">
         <tr>
             <td class="left-col">
                 <span class="label label-default">To</span>
             </td>
             <td class="middle-col">
-                <div class="compose-table requiresKeyboard white-border" id="group2group1group1">
-                    <textarea class="textBox" id="toTextArea"> </textarea>
+                <div id="group2group1group1" class="compose-table requiresKeyboard white-border">
+                    <textarea class="textBox" id="toTextArea"></textarea>
                 </div>
             </td>
 			<td class="right-col">
-				<div id = "group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection()">Select</div>
+				<div id="group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection()">Select</div>
 			</td>
         </tr>
     </table>
@@ -88,7 +89,7 @@
         <!-- RECIPIENTS -->
         <tr>
             <td>
-                <div class="recipient-container" id="group2group1group2group2" onclick="toggleRecipient(this)">
+                <div class="recipient-container hide" id="group2group1group2group2" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide">John Smith</div>
                 </div>
                 <div class="email-address">johnny9878@gmail.com</div>
@@ -97,7 +98,7 @@
 
         <tr>
             <td>
-                <div class="recipient-container"  id="group2group1group2group3" onclick="toggleRecipient(this)">
+                <div class="recipient-container hide"  id="group2group1group2group3" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide">Sally Fields</div>
                 </div>
                 <div class="email-address">sally.fields@gmail.com</div>
@@ -106,7 +107,7 @@
         
         <tr>
             <td>
-                <div class="recipient-container" id="group2group1group2group4" onclick="toggleRecipient(this)">
+                <div class="recipient-container hide" id="group2group1group2group4" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide" >Joe Brown</div>
                 </div>
                 <div class="email-address">joe_brown@gmail.com</div>
@@ -115,7 +116,7 @@
         
         <tr>
             <td>
-                <div class="recipient-container" id="group2group1group2group5" onclick="toggleRecipient(this)">
+                <div class="recipient-container hide" id="group2group1group2group5" onclick="toggleRecipient(this)">
                     <div class="recipient btn btn-default hide">owen_thomas@gmail.com</div>
                 </div>
                 <div class="email-address"></div>
@@ -151,7 +152,7 @@
 
 <!-- KEYBOARD -->
 <div id="hideKeyboard" class="hide" onclick=hideKeyboard()></div>
-<iframe id="keyboardFrame" class="hide" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no" ></iframe>
+<iframe id="keyboardFrame" class="hide" sandbox="allow-same-origin allow-scripts allow-forms" scrolling="no" frameborder="0"></iframe>
 
 
 

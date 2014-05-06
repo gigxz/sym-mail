@@ -3,30 +3,20 @@ var pageNumber,
     maxPages;
 
 window.addEventListener('load', function(){
-    pageNumber = 1;
-    maxPages = 100; //TODO
-
-    get_box_data_page(pageNumber, function(data) {
+    maxPages = 100; //TODO delete
+    $('#loadingScreen').fadeIn(0);
+    cyclingOn(0); // stop cycling
+    get_box_data_page(1, function(data) {
         //totalNumber = data.total;
         //maxPages = totalNumber/6;
-        replaceBoxMessages(data);
-        setPageIndicator();
-        //showHideNavigationArrows();
+        replaceBoxMessages(data, function() {
+            // everything loaded, start cycling
+            $('#loadingScreen').fadeOut(300);
+            cyclingOn(1); 
+        });
     });
 }, false);
 
-function get_box_data(callback) {   
-    var box = 'http://localhost:8080/getemails/' + meta('boxname');
-    make_request(box, function(e) {
-        if (this.status == 200) {       
-            var content = this.responseText;
-            var data = JSON.parse(content);
-            callback(data);
-        } else {
-            alert("Feed Request was invalid.");
-        }               
-    });
-}
 
 /* GET DATA ON A SPECIFIC PAGE */
 function get_box_data_page(pgNum, callback) {
@@ -36,6 +26,7 @@ function get_box_data_page(pgNum, callback) {
         if (this.status == 200) {       
             var content = this.responseText;
             var data = JSON.parse(content);
+            pageNumber = pgNum; //successful, so change page num
             callback(data);
         } else {
             alert("Feed Request was invalid.");
@@ -51,27 +42,29 @@ function setPageIndicator() {
 function scrollBox(dir) {
     // page up
     if(dir===1) {
-        pageNumber--;
-        get_box_data_page(pageNumber, function(data) {
+        console.log("CALLING PAGE UP");
+        cyclingOn(0); // stop cycling
+        get_box_data_page(pageNumber-1, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
-            console.log("CALLING PAGE UP");
-            replaceBoxMessages(data);
-            setPageIndicator();
-            //showHideNavigationArrows();
+            
+            replaceBoxMessages(data, function() {
+                cyclingOn(1); // everything loaded, start cycling
+            });
         });
     }
 
     // page down
     else if(dir === -1) {
-        pageNumber++;
-        get_box_data_page(pageNumber, function(data) {
+        console.log("CALLING PAGE DOWN");
+        cyclingOn(0); // stop cycling
+        get_box_data_page(pageNumber+1, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
-            console.log("CALLING PAGE DOWN");
-            replaceBoxMessages(data);
-            setPageIndicator();
-            //showHideNavigationArrows();
+            
+            replaceBoxMessages(data, function() {
+                cyclingOn(1); // everything loaded, start cycling
+            });
         });
     }
 }
@@ -82,7 +75,7 @@ function readEmail(inboxmsg) {
 
 
 /* given a list of 6 new messages, replace what's visible in the inbox */
-function replaceBoxMessages(newMessages) {
+function replaceBoxMessages(newMessages, callback) {
 	//alert("Replace Inbox Messages");
     $('.inboxmsg').each(function(index, obj) {
         $(this).attr('uid', newMessages[index].uid);
@@ -100,9 +93,22 @@ function replaceBoxMessages(newMessages) {
         // replace message
         var htmlMSG = newMessages[index].message;
         $(this).find('.message').text($.trim(htmlMSG));
+    }).promise().done(function() {
+
+        // reset page indicator and arrows
+        setPageIndicator();
+        showHideNavigationArrows();
+        callback();
     });
 }
 
+
+/* hide arrows while next page is loading */
+function hideArrows() {
+    // $('.arrowup').addClass('hide');
+    // $('.arrowdown').addClass('hide');
+    // $('.arrows').addClass('hide');
+}
 
 
 function showHideNavigationArrows() {

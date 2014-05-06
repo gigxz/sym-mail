@@ -3,8 +3,10 @@ var groupNumber = 0,
     stringGroup,
     intervalFunction,    
     waitTime = 1000,
-    fontSize;
+    fontSize,
+    cyclingActive = false;
 
+/* sets up for cycling but does not start it */
 window.addEventListener('load', function(){
     $(window).focus();
     //set font size
@@ -14,26 +16,28 @@ window.addEventListener('load', function(){
     document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 
     addTransitions();
-    intervalFunction = setInterval(cycle, waitTime);
-    clickHandler(); 
-
 }); 
 
+/* cyclingOn(1) to BEGIN, cyclingOn(0) to STOP */
 function cyclingOn(num) {
-    if(num===1) {
-        // turn on
-        console.log("RESTARTING CYCLING");
-        clearInterval(intervalFunction); // just in case
+    // turn on
+    if(num===1 && cyclingActive===false) {
+        cyclingActive = true;
+        console.log("CYCLING: ON");
+        $(window).focus();
+        clearInterval(intervalFunction);
         groupNumber = 0;
         id = 'group';
         waitTime = 1000;
         intervalFunction = setInterval(cycle, waitTime);
         clickHandler(); 
     }
-    // else if(num===0) {
-    //     //turn off
-    //     clearInterval(intervalFunction);
-    // }
+    // turn off
+    else if(num===0 && cyclingActive===true) {
+        cyclingActive = false;
+        console.log("CYCLING: OFF");
+        window.clearInterval(intervalFunction);
+    }
 }
 
 
@@ -71,12 +75,22 @@ var clickHandler = function() {
         // (i.e. page scrolling down when you press space)
         $(document).keydown(function(e) {
             if(e.keyCode === 32) {
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                e.preventDefault();
                 return false;
             }
         });
 
         $(document).keyup(function(e) {
             if (e.keyCode === 32){
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                e.preventDefault(); 
+                if(!cyclingActive) {
+                    return;
+                }
+
                 clearInterval(intervalFunction);
                 if (stringGroup === '#goBack') {
                     // ex. compose checks special things if goback is clicked
@@ -96,32 +110,60 @@ var clickHandler = function() {
                     else {
                         // if one level down exists AND is not hidden
                         var levelDownSelecter = '#'+id + groupNumber + 'group1';
-                        if ($(levelDownSelecter).length && !$(levelDownSelecter).hasClass('hide')) {
-                            id = id + groupNumber + 'group'
-                            groupNumber = 0;
-                        } 
-                        else {
-                            //CLICK ON ITEM
-                            //TODO FIX THIS BUG WTF
-                            if(elementExists(id+groupNumber)) {
-                                document.getElementById(id+groupNumber).click();
+                        hasUnhiddenChildren(id+groupNumber, function(numChildren, singleChildID) {
+                            if ($(levelDownSelecter).length && numChildren > 1){//!$(levelDownSelecter).hasClass('hide')) {
+                                id = id + groupNumber + 'group'
+                                groupNumber = 0;
+                            } 
+                            else if(numChildren === 1) {
+                                id = singleChildID.substring(0, singleChildID.length-1);
+                                groupNumber = singleChildID.substring(singleChildID.length-1, singleChildID.length);
+                                document.getElementById(singleChildID).click();
                             }
                             else {
-                                console.log("WHAAaaaaaaAAAt");
-                            }
-                        } 
-                    
-                        intervalFunction = setInterval(cycle, waitTime);     
+                                //CLICK ON ITEM
+                                //TODO FIX THIS BUG WTF
+                                if(elementExists(id+groupNumber)) {
+                                    document.getElementById(id+groupNumber).click();
+                                }
+                                else {
+                                    console.log("WHAAaaaaaaAAAt");
+                                }
+                            } 
+                        
+                            intervalFunction = setInterval(cycle, waitTime); 
+                        });
+    
                     }
                 }
                  
-                console.log("CLICK IN SCRIPT2: "+id+groupNumber);
+                //console.log("CLICK IN SCRIPT2: "+id+groupNumber);
            }
         });
 };
 
+var hasUnhiddenChildren = function(groupid, callback) {
+    var child_id_len = groupid.length + "group".length + 1;
+    var numVisibleChildren = 0;
+    var onlyChildID = null;
+
+    $("[id^='"+groupid+"']").each(function(index, obj) {
+        if($(this).attr('id').length === child_id_len) {
+            if(!$(this).hasClass('hide')){
+                numVisibleChildren++;
+                if(onlyChildID === null)
+                    onlyChildID = $(this).attr('id');
+            }
+        }
+    }).promise().done(function() {
+        callback(numVisibleChildren, onlyChildID);
+    });
+}
+
+
 var animate = function(stringGroup){
-	
+	if(!cyclingActive)
+        return;
     // $( stringGroup ).animate(
     //     {fontSize: '120%', 
     //      //backgroundColor: 'blue'
@@ -135,7 +177,6 @@ var animate = function(stringGroup){
     setTimeout(function(){
         $(stringGroup).removeClass('boxed');
     }, waitTime);
-	
 	
 	// OPTION 3: changing background color
 	//$(stringGroup).effect('highlight', {color:'#7D7D7D', easing:'easeInExpo'}, waitTime);

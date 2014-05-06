@@ -2,10 +2,9 @@ var subject = "";
 var sender = "";
 
 window.onload = function() {
+    $('#loadingScreen').fadeIn(0);
     get_message_data(function() {
-        showHideScrollArrows();
-
-
+        // set up header
         var header = "Inbox";
         if(document.referrer.indexOf("drafts") > -1) {
             header = "Drafts";
@@ -21,6 +20,11 @@ window.onload = function() {
             header += " > Read Message";
         }
         $('#pathHeader').text(header);
+
+        // show/hide arrows and begin cycling
+        $('#loadingScreen').fadeOut(300);
+        showHideScrollArrows();
+        cyclingOn(1);
     });
 }
 
@@ -36,7 +40,6 @@ function deleteMessage(inboxmsg) {
         
     }); 
     window.location.href = document.referrer;
-   // window.history.back();
 }
 
 
@@ -46,11 +49,8 @@ function get_message_data(callback) {
             var content = this.responseText;
             var data = JSON.parse(content);
             $("#from").text(data[0].from.name);
-			console.log(data[0].from);
 
             var toString = '';
-            console.log(data[0].to);
-            console.log(data[0].to.name);
             for(item in data[0].to) {
                 var n = data[0].to[item].name;
                 var e = data[0].to[item].address;
@@ -65,6 +65,7 @@ function get_message_data(callback) {
             callback();
         } else {
             alert("Feed Request was invalid.");
+            cyclingOn(1); // still must be able to hit 'back'
         }               
     });
 }

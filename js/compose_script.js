@@ -1,30 +1,38 @@
 var recipients = [];
 
-/* ON LOAD */
+/* on load */
 $(window).load(function() {
-	console.log("COMPOSE LOADING uid: "+meta('uid'));
-	if(meta('uid')!='') {
+    // IF WRITING REPLY
+	if(meta('uid').length > 0) {
+        // loading screen
+        $('#loadingScreen').fadeIn(0);
+
 		get_reply_data(function(subjText) {
 			if(subjText && subjText.length > 30) {
 				subjText = subjText.substring(0, 30 + "...");
 			}
-			var header = "Inbox";
+			var header = "Inbox > ";
 	        if(document.referrer.indexOf("drafts") > -1) {
-	            header = "Drafts";
+	            header = "Drafts > ";
 	        }
 	        if(subjText) {
-	            header += " > " + subjText;
+	            header += subjText;
 	        }
 	        else {
-	            header += " > Read Message";
+	            header += "Read Message";
 	        }
 	        header += " > Reply";
 	        $('#pathHeader').text(header);
 
+            $('#loadingScreen').fadeOut(300);
 	        showHideScrollArrows();
+            // turn on cycling once everything has loaded
+            cyclingOn(1);
 		});
 	}
+    // ELSE IF REGULAR COMPOSE
 	else {
+        cyclingOn(1);
 		$('#pathHeader').text('Compose');
 	}
 
@@ -161,16 +169,7 @@ function expandToSelection(){
 
 		var emails = $( ".email-address" ); 
 		for (var i = 0; i < emails.length && i < abook.length; i++) {
-// <<<<<<< HEAD
-// 			//console.log(emails[i].innerHTML); 
  			emails[i].innerHTML = abook[i]['email']; 
-// =======
-			// if (abook[i]['nickname'] != ""){
-			// 	emails[i].innerHTML = abook[i]['email']; 
-			// } else {
-			// 	emails[i].innerHTML = abook[i]['email']; 
-			// }
-//>>>>>>> 8b84161976328b139dd9fcd65e2c51ac7c13c831
 		};
     }); 
 

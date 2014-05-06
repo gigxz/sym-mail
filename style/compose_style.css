@@ -9,6 +9,7 @@
 	border: 2px solid white;
 }
 
+
 .firstButtonGroup {
 	padding:2px;
 }
@@ -44,11 +45,17 @@ table.compose-table td {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 }
+
+
 /* to-field textarea */
 #to {
 	width: 19em;
 	padding: 1px;
 }
+
+
+
+
 
 /* subject-field textarea */
 #subjectText {
@@ -100,7 +107,8 @@ table.compose-table td {
 	box-shadow:3px 10px 20px #575757;
 	z-index:1;
 	position:absolute;
-	left:560px;
+	margin: 0 auto;
+	width:680px;
 }
 
 .recipient-container {
