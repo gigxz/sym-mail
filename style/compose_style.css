@@ -8,11 +8,10 @@
 	margin-left: 20px;
 	border: 2px solid white;
 }
-
-
-.firstButtonGroup {
-	padding:2px;
+.btn-block {
+	border: 2px solid white !important; 
 }
+
 table.compose-table {
 	width:100%;
 	border:2px solid white;
@@ -83,9 +82,7 @@ table.compose-table td {
 
 
 .requiresKeyboard {
-	width: inherit;
-
-	
+	width: inherit;	
 	max-height:200px;
 	padding:1px;
 }
