@@ -22,7 +22,7 @@ window.addEventListener('load', function(){
 function get_box_data_page(pgNum, callback) {
     var box = 'http://localhost:8080/getemails/' + meta('boxname')+'/'+pgNum;
     console.log("REQUESTING PAGE "+pgNum);
-    make_request(box, function(e) {
+    make_request(box, function() {
         if (this.status == 200) {       
             var content = this.responseText;
             var data = JSON.parse(content);
@@ -30,6 +30,7 @@ function get_box_data_page(pgNum, callback) {
             callback(data);
         } else {
             alert("Feed Request was invalid.");
+            //TODO error... clear loading screen
         }               
     });  
 }
@@ -79,20 +80,26 @@ function replaceBoxMessages(newMessages, callback) {
 	//alert("Replace Inbox Messages");
     $('.inboxmsg').each(function(index, obj) {
         $(this).attr('uid', newMessages[index].uid);
-
+        
         // replace sender
-        $(this).find('.sender').text(newMessages[index].sender);
+        var from = newMessages[index].sender.address;
+        var name = newMessages[index].sender.name;
+        if(name.length>0)
+            from = name;
+        $(this).find('.sender').text(from);
 
         // replace subject
         $(this).find('.subject').text(newMessages[index].subject);
 
         // replace timestamp
-        var timestamp = newMessages[index].timestamp
+        var timestamp = newMessages[index].timestamp;
         $(this).find('.timestamp').text(getFormattedDate(timestamp));
 
         // replace message
         var htmlMSG = newMessages[index].message;
         $(this).find('.message').text($.trim(htmlMSG));
+
+        callback();
     }).promise().done(function() {
 
         // reset page indicator and arrows
