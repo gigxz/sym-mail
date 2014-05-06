@@ -145,21 +145,32 @@ function Recipient(nickname, email) {
 	this.nickname = nickname;
 	this.email = email;
 }
-
-function expandToSelection(){
+var pageNumber;
+function expandToSelection(num){
 	console.log("selecting");
-	pageNumber = 0; //this is what page you are on
+	pageNumber = num; //this is what page you are on
+
+
+    $('#recipientBoxRow').removeClass('hide');
+    // remove hide from all descendants
+    $('#recipientBoxRow').find('.hide').removeClass('hide');
 
 	var offset = 0 + parseInt(pageNumber);
 	url = 'http://localhost:8080/addressBook/' + offset; 
     make_request(url, function(e) {
     	var content = this.responseText; 
-		//console.log(content);
+		console.log(content);
 		var abook = JSON.parse(content); 
 		abook = abook['contacts'];
 		//console.log(abook)
 		var count = 0; 
 		var recipient = $( ".recipient" );
+		if (abook.length<recipient.length){
+			console.log("need to hide");
+			$(".recipient-container:last").addClass('hide');
+			$(".email-address:last").addClass('hide');
+			$('.seeNextRecip').addClass('hide');
+		}
 		for (var i = 0; i < recipient.length && i < abook.length; i++) {
 			if (abook[i]['nickname'] != ""){
 				recipient[i].innerHTML = abook[i]['nickname']; 
@@ -174,11 +185,11 @@ function expandToSelection(){
 		};
     }); 
 
-    $('#recipientBoxRow').removeClass('hide');
-    // remove hide from all descendants
-    $('#recipientBoxRow').find('.hide').removeClass('hide');
+    
 
-    $('.seePrevRecip').addClass('hide'); //no prevs to start with
+    if (pageNumber==0){
+    	$('.seePrevRecip').addClass('hide'); //no prevs to start with
+    }
     // set id to id of seePrevRecip
     var newID = $('.seePrevRecip').attr('id');
     newID = newID.substring(0, newID.length-1);
@@ -241,10 +252,11 @@ function removeRecipient(email) {
 //TODO cycling through recipients
 function cycleRecipients(dir) {
     if(dir === 0) {
-        // see prev 4
+        expandToSelection(pageNumber-1);
     }
     else if(dir === 1) {
-        // see next 4
+		$('.seePrevRecip').removeClass('hide');
+        expandToSelection(pageNumber+1);
     }
 }
 
