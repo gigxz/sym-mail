@@ -58,7 +58,7 @@ function get_reply_data(callback) {
 
 			$("#from").html();
 
-			$("#toTextArea").html(data[0].from.name);
+			$("#toTextArea").html(data[0].from.address);
 			//console.log("from: ");
 			//console.log(data[0].from.name+","+data[0].from.address);
 			recipients.push(new Recipient(data[0].from.name, data[0].from.address));
@@ -120,6 +120,7 @@ function saveDraft(msg){
 
 
 function sendMail(msg){
+    console.log("SENDING");
     var request = new XMLHttpRequest();
     url = 'http://localhost:8080/sendmail';
     request.open('POST', url, true);
@@ -194,6 +195,7 @@ function expandToSelection(num){
     newID = newID.substring(0, newID.length-1);
     id = newID;
     groupNumber = 0;
+    console.log("SETTING TO "+id+groupNumber);
 }
 
 function goBackClicked() {
@@ -232,7 +234,7 @@ function toggleRecipient(obj) {
 		}
 	}
 	$('#toTextArea').text(recipString);
-	$('#toTextArea').change();
+	$('#toTextArea').change(); //TODO resize
 }
 
 function removeRecipient(email) {

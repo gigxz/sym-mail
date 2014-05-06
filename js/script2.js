@@ -95,11 +95,11 @@ var clickHandler = function() {
                 if (stringGroup === '#goBack') {
                     // ex. compose checks special things if goback is clicked
                     document.getElementById('goBack').click();
-
                     groupNumber = 0; 
                     id = id.slice(0, -6);
+                    console.log("should go back? "+id);
                     if (id.length < 2) {
-                        window.history.back();
+                        window.location.href = document.referrer;
                     }
                     intervalFunction = setInterval(cycle, waitTime);
                 }
@@ -121,8 +121,6 @@ var clickHandler = function() {
                                 document.getElementById(singleChildID).click();
                             }
                             else {
-                                //CLICK ON ITEM
-                                //TODO FIX THIS BUG WTF
                                 if(elementExists(id+groupNumber)) {
                                     document.getElementById(id+groupNumber).click();
                                 }
@@ -136,8 +134,6 @@ var clickHandler = function() {
     
                     }
                 }
-                 
-                //console.log("CLICK IN SCRIPT2: "+id+groupNumber);
            }
         });
 };
@@ -263,7 +259,6 @@ function make_request(url, callback) {
     console.log("Making a http request to: " + url);
     request.addEventListener('load', callback, false);  
     request.send(null);
-    //return request;
 }
 
 function meta(name) {
