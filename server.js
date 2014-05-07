@@ -50,6 +50,9 @@ conn.query(addSelf);
 function addressBookEntry(clientEmail, recipientEmail, recipientNickname) {
   console.log("addressBook");
   var inDatabase = true; 
+  if (recipientEmail === "" || (recipientEmail.indexOf("@") < 0)) {
+    return; 
+  }
   q = conn.query(selectAddress, [clientEmail, recipientEmail]); 
   q.on('row', function(row) {
      //that row exits so update it and add one to the row's count 
@@ -101,6 +104,27 @@ function sendmail(message){
   });
 }
 
+function deleteUid(uid) {
+  try {
+    console.log("calling delete"); 
+    imap.seq.move(uid, '[Gmail]/Trash', function(err) {
+      if (err) { console.log( "imap.seq.move: delete error" + err); }
+    }); 
+    imap.once('error', function(e){
+      console.log("error deleting, waiting then trying again " + err); 
+      setInterval(deleteUid(uid), 5000);
+
+    })
+    imap.once('end', function(e){
+      return; 
+    })
+  } catch (err) {
+    console.log("error deleting, waiting then trying again " + err); 
+    setInterval(deleteUid(uid), 5000);
+  }
+
+}
+
 function saveDrafts(request){
   imap = new Imap({
       user: 'speakyourmail@gmail.com',
@@ -109,24 +133,28 @@ function saveDrafts(request){
       tls: true
     });
 
-  console.log('calling save');
-
   imap.once('ready', function(){
     console.log("imap ready");
-    openEmailBox('INBOX', function(e){
+    openEmailBox('[Gmail]/Drafts', function(e, box){
+      console.log(request.body.uid);
+      if (parseInt(request.body.draft_id) == box.messages.total){
+        deleteUid(request.body.draft_id); 
+      }
       var mailcomposer = new MailComposer(); 
-
       mailcomposer.setMessageOption({
         from: "speakyourmail@gmail.com", 
         to: request.body.toText, 
         subject: request.body.subjectText, 
-        body: request.body.bodyText
+        text: request.body.bodyText, 
       })
 
       var emailString = mailcomposer.buildMessage(function(err, messageSource){
-        imap.append(messageSource, {mailbox: '[Gmail]/Drafts', date: "Tue May 06 2014 17:14:51 GMT-0400 (EDT)"}, function(err){
+        imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
           if (err) {
               console.log("append error in save: " + err);
+              imap.end(); 
+              setTimeout(saveDrafts(request), 3000); 
+
           }
           console.log("trying to append");
         }); 
@@ -136,7 +164,7 @@ function saveDrafts(request){
   imap.once('error', function(e){
       console.log("error in imap in save: " + e); 
       imap.end();
-      saveDrafts(request);
+      setTimeout(saveDrafts(request), 3000); 
       
   });
   imap.once('end', function(){
@@ -308,17 +336,22 @@ app.get('/mailboxes', function(request, response) {
 
 //	IMAP CALL TO OPEN MAILBOXE
 function openEmailBox(box, cb) {
-  imap.openBox(box, false, cb);
-  imap.once('error', function(e){
-    console.log("open email box, line 257. " + e); 
-    openEmailBox(box,cb);
-  });
+  try {
+    imap.openBox(box, false, cb);
+    imap.once('error', function(e){
+      console.log("open email box, line 257. " + e); 
+    });
+  }
+  catch(err) {
+    console.log("Error opening the email box, possibly too many repeated requsts to server. " + err); 
+    imap.end(); 
+  }
 }
 
 app.get('/email/:boxname/:uid', function(request, response) {
 	var uid = request.params.uid;
   var boxname = request.url.split('/')[2]; //get the unparsed url sense it gets unencoded by express
-	response.render('read_email.html', {uid: uid, boxname: boxname});
+  response.render('read_email.html', {uid: uid, boxname: boxname});
 });
 
 
@@ -342,73 +375,77 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
         if (err) throw err;
       
         var buffer = '';
-        var f = imap.fetch(results, {
-    //       bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
-          bodies: '',
-          struct: true
-        });
-        f.on('message', function(msg, seqno) {
-          //console.log('Message #%d', seqno);
-          var prefix = '(#' + seqno + ') ';
-          
-          var headers='';
-          var uid=0;
-         
-          msg.on('body', function(stream, info) {
-             //var buffer = '';
-            stream.on('data', function(chunk) {
-              buffer += chunk.toString('utf8');
-              console.log('Stream Data Handler');
-            });
-            stream.once('end', function() {
+        try {
+          var f = imap.fetch(results, {
+      //       bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+            bodies: '',
+            struct: true
+          });
+          f.on('message', function(msg, seqno) {
+            //console.log('Message #%d', seqno);
+            var prefix = '(#' + seqno + ') ';
+            
+            var headers='';
+            var uid=0;
+           
+            msg.on('body', function(stream, info) {
+               //var buffer = '';
+              stream.on('data', function(chunk) {
+                buffer += chunk.toString('utf8');
+                console.log('Stream Data Handler');
+              });
+              stream.once('end', function() {
 
-    			// mailparser.end();
-              console.log('Stream End Handler');
+      			// mailparser.end();
+                console.log('Stream End Handler');
 
-              //console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+                //console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+              });
+              console.log('Message Body Handler');
             });
-            console.log('Message Body Handler');
+            msg.once('attributes', function(attrs) {
+              //console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
+              //uid = attrs.uid;
+              console.log('Message Handler Attributes');
+            });
+            msg.once('end', function() {
+            	// num++;
+            	var mailparser = new MailParser();
+            		mailparser.on('end', function(mail_object) {
+          				text =  mail_object.html;
+                  messages.unshift({ //insert first
+          // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
+          					from: mail_object.from[0],
+          					subject: mail_object.subject,
+          					to: mail_object.to, // a list of 'to' objects (name and address)
+          					date: mail_object.date,
+          					body: mail_object.html, 
+                    text: mail_object.text
+                  });
+          				console.log('ENDING MAILPARSER');
+          				imap.end();
+          		  });
+      			mailparser.write(buffer);
+      			mailparser.end();
+        		console.log('Message Handler End');
+                	
+            });
           });
-          msg.once('attributes', function(attrs) {
-            //console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
-            //uid = attrs.uid;
-            console.log('Message Handler Attributes');
+          f.once('error', function(err) {
+          	imap.end();
+            console.log('Fetch error: ' + err);
           });
-          msg.once('end', function() {
-          	// num++;
-          	var mailparser = new MailParser();
-          		mailparser.on('end', function(mail_object) {
-        				text =  mail_object.html;
-						    console.log("subject: "+mail_object.subject);
-                messages.unshift({ //insert first
-        // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
-        					from: mail_object.from[0],
-        					subject: mail_object.subject,
-        					to: mail_object.to, // a list of 'to' objects (name and address)
-        					date: mail_object.date,
-        					body: mail_object.html
-        				});
-        				console.log('ENDING MAILPARSER');
-        				imap.end();
-        		  });
-    			mailparser.write(buffer);
-    			mailparser.end();
-      		console.log('Message Handler End');
-              	
+          f.once('end', function() {
+            console.log('Done fetching all messages!');
+              // mailparser.end();
+              // response.send(text);
+      		  imap.end();
           });
-        });
-        f.once('error', function(err) {
-        	imap.end();
-          console.log('Fetch error: ' + err);
-        });
-        f.once('end', function() {
-          console.log('Done fetching all messages!');
-            // mailparser.end();
-            // response.send(text);
-    		  imap.end();
-        });
-        //console.log('Done fetching all messages!');
-        //imap.end();
+        } catch(err){
+          console.log('fetching error');
+          imap.end();
+        }
+
       });
     });
   });
@@ -490,6 +527,7 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
     					sender: mail_object.from[0],
     					subject: mail_object.subject,
     					message: mail_object.text,
+              html: mail_object.html,
     // 					to: mail_object.to[0].name,
     					timestamp: mail_object.date,
     					uid: uid
@@ -550,7 +588,10 @@ app.get('/delete/:boxname/:uid', function(request, response) {
   imap.once('ready', function() {
     // open up all of the inboxes
     openEmailBox(boxname, function(err, box) {
-      if (err) throw err;
+      //deleteUid(uid);
+      if (err) {
+        console.log("deleting err from open email box")
+      }
       imap.seq.move(uid, '[Gmail]/Trash', function(err) {
         if (err) { console.log( "imap.seq.move: delete error" + err); }
       }); 
@@ -590,13 +631,67 @@ app.get('/drafts', function(request, response) {
   response.render('drafts.html', {boxname:'%5BGmail%5D%2FDrafts'});
 });
 app.get('/compose', function(request, response) {
-  response.render('compose.html');
+  imap = new Imap({
+    user: 'speakyourmail@gmail.com',
+    password: 'testPassword',  host: 'imap.gmail.com',
+    port: 993,
+    tls: true,
+  });
+
+  imap.once('ready', function() {
+    // open up all of the inboxes
+    openEmailBox('[Gmail]/Drafts', function(err, box) {
+      if (err) {
+        console.log("err from compose with opening box: " + err); 
+      };
+        response.render('compose.html', {boxname: '%5BGmail%5D%2FDrafts', uid: box.messages.total +1,  draft_id: box.messages.total +1});
+    });
+  });
+  imap.once('error', function(err) {
+    console.log("imap delete error" + err);
+  });
+
+  imap.once('end', function() {
+    console.log('Connection ended');
+  });
+  imap.connect();
 });
 
 app.get('/compose/:boxname/:uid', function(request, response) {
-	var uid = request.params.uid;	
-  var boxname = request.params.boxname; 
-	response.render('compose.html', {boxname: boxname, uid: uid});
+  var boxname = request.url.split('/')[2]; //get the unparsed url sense it gets unencoded by express
+  var uid = request.params.uid;
+  imap = new Imap({
+    user: 'speakyourmail@gmail.com',
+    password: 'testPassword',  host: 'imap.gmail.com',
+    port: 993,
+    tls: true,
+  });
+
+  imap.once('ready', function() {
+    // open up all of the inboxes
+    openEmailBox('[Gmail]/Drafts', function(err, box) {
+      if (err) {
+        console.log("err from compose with opening box: " + err); 
+      };
+        response.render('compose.html', {boxname: boxname, uid: uid, draft_id: box.messages.total +1});
+    });
+  });
+  imap.once('error', function(err) {
+    console.log("imap delete error" + err);
+  });
+
+  imap.once('end', function() {
+    console.log('Connection ended');
+  });
+  imap.connect();
+	// var uid = request.params.uid;	
+ //  var boxname = request.params.boxname; 
+ //  if ('[Gmail]/Drafts' === boxname){
+ //    boxname = request.url.split('/')[2]; //get the unparsed url sense it gets unencoded by express
+ //    response.render('drafts_compose.html', {boxname: boxname, uid: uid}); 
+ //  }else {
+ //    response.render('compose.html', {boxname: boxname, uid: uid});
+ //  }
 });
 
 app.get('/settings', function(request, response) {

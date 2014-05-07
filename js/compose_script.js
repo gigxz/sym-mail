@@ -3,7 +3,7 @@ var recipients = [];
 /* on load */
 $(window).load(function() {
     // IF WRITING REPLY
-	if(meta('uid').length > 0) {
+	if(meta('boxname').length > 0) {
         // loading screen
         $('#loadingScreen').fadeIn(0);
 
@@ -39,16 +39,17 @@ $(window).load(function() {
 
     $("#write").on('change keyup paste', function() {
         showHideScrollArrows();
+        setTimeout(saveDraft(this), 3000); 
     });
 
     $("#toTextArea").on('change keyup paste', function() {
         $(this).height(this.scrollHeight);
-
+        setTimeout(saveDraft(this), 3000); 
     });
 
     $("#subjectText").on('change keyup paste', function() {
         $(this).height(this.scrollHeight);
-
+        setTimeout(saveDraft(this),3000); 
     });
 
 });
@@ -97,10 +98,9 @@ function submitEmail() {
 }
 
 function deleteMessage(inboxmsg) {
-    make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
-        window.location.href = 'http://localhost:8080/';
+    make_request('http://localhost:8080/delete/' + meta("uid"), function(e) {
     }); 
-
+    window.location.href = 'http://localhost:8080/';
 }
 
 function saveDraft(msg){
@@ -117,9 +117,10 @@ function saveDraft(msg){
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
-    	"bodyText": document.getElementById("write").value
+    	"bodyText": document.getElementById("write").value, 
+        "draft_id": meta("draft_id")
     }));
-    //window.location.href = "http://localhost:8080/inbox";
+    window.location.href = "http://localhost:8080/inbox";
 }
 
 
