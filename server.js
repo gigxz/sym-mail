@@ -124,19 +124,18 @@ function saveDrafts(request){
       })
 
       var emailString = mailcomposer.buildMessage(function(err, messageSource){
-        console.log("problem is probs with append");
-        imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
+        imap.append(messageSource, {mailbox: '[Gmail]/Drafts', date: "Tue May 06 2014 17:14:51 GMT-0400 (EDT)"}, function(err){
           if (err) {
               console.log("append error in save: " + err);
           }
           console.log("trying to append");
-          imap.end();
         }); 
       });
     })
   })
   imap.once('error', function(e){
       console.log("error in imap in save: " + e); 
+      imap.end();
       saveDrafts(request);
       
   });
@@ -147,48 +146,48 @@ function saveDrafts(request){
 }
 
 app.post('/save', function(request, response){
-  //saveDrafts(request);
-  imap = new Imap({
-      user: 'speakyourmail@gmail.com',
-      password: 'testPassword',  host: 'imap.gmail.com',
-      port: 993,
-      tls: true
-    });
+  saveDrafts(request);
+  // imap = new Imap({
+  //     user: 'speakyourmail@gmail.com',
+  //     password: 'testPassword',  host: 'imap.gmail.com',
+  //     port: 993,
+  //     tls: true
+  //   });
 
-  console.log('calling save');
+  // console.log('calling save');
 
-  imap.once('ready', function(){
-    console.log("imap ready");
-    openEmailBox('INBOX', function(e){
-      var mailcomposer = new MailComposer(); 
+  // imap.once('ready', function(){
+  //   console.log("imap ready");
+  //   openEmailBox('INBOX', function(e){
+  //     var mailcomposer = new MailComposer(); 
 
-      mailcomposer.setMessageOption({
-        from: "speakyourmail@gmail.com", 
-        to: request.body.toText, 
-        subject: request.body.subjectText, 
-        body: request.body.bodyText
-      })
+  //     mailcomposer.setMessageOption({
+  //       from: "speakyourmail@gmail.com", 
+  //       to: request.body.toText, 
+  //       subject: request.body.subjectText, 
+  //       body: request.body.bodyText
+  //     })
 
-      var emailString = mailcomposer.buildMessage(function(err, messageSource){
-        console.log("problem is probs with append");
-        imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
-          if (err) {
-              console.log("append error in save: " + err);
-          }
-          console.log("trying to append");
-          imap.end(); 
-        }); 
-      });
-    })
-  })
-  imap.once('error', function(e){
-      console.log("error in imap in save: " + e); 
+  //     var emailString = mailcomposer.buildMessage(function(err, messageSource){
+  //       console.log("problem is probs with append");
+  //       imap.append(messageSource, {mailbox: '[Gmail]/Drafts'}, function(err){
+  //         if (err) {
+  //             console.log("append error in save: " + err);
+  //         }
+  //         console.log("trying to append");
+  //         imap.end(); 
+  //       }); 
+  //     });
+  //   })
+  // })
+  // imap.once('error', function(e){
+  //     console.log("error in imap in save: " + e); 
 
-  });
-  imap.once('end', function(){
-      console.log("saved draft");
-  });  
-  imap.connect(); 
+  // });
+  // imap.once('end', function(){
+  //     console.log("saved draft");
+  // });  
+  // imap.connect(); 
 }); 
 
 app.post('/sendmail', function(request, response) {
@@ -199,7 +198,7 @@ app.post('/sendmail', function(request, response) {
   // Message object
   var message = {
       // sender info
-      from: from,
+      from: [from],
 
       // Comma separated list of recipients
       to: request.body.toText, 
@@ -373,8 +372,8 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
           	var mailparser = new MailParser();
           		mailparser.on('end', function(mail_object) {
         				text =  mail_object.html;
-						console.log("from address: "+mail_object.from[0].address);
-        				messages.unshift({ //insert first
+						    console.log("subject: "+mail_object.subject);
+                messages.unshift({ //insert first
         // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
         					from: mail_object.from[0],
         					subject: mail_object.subject,
@@ -491,7 +490,7 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
            	
         	var mailparser = new MailParser();
         	mailparser.on('end', function(mail_object) {
-          	//console.log(mail_object.from[0].name);
+            console.log("subject: "+mail_object.subject + "date: " + mail_object.date);
     				messages.unshift({
     					sender: mail_object.from[0].name,
     					subject: mail_object.subject,

@@ -93,6 +93,7 @@ function replaceBoxMessages(newMessages, callback) {
         // replace message
         var htmlMSG = newMessages[index].message;
         $(this).find('.message').text($.trim(htmlMSG));
+        callback();
     }).promise().done(function() {
 
         // reset page indicator and arrows

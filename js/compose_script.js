@@ -102,6 +102,7 @@ function deleteMessage(inboxmsg) {
 
 function saveDraft(msg){
 	var request = new XMLHttpRequest();
+    console.log("saving");
     url = 'http://localhost:8080/save';
     request.open('POST', url, true);
    	request.setRequestHeader('Content-Type', "application/json"); 
@@ -115,7 +116,7 @@ function saveDraft(msg){
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value
     }));
-    window.location.href = "http://localhost:8080/inbox";
+    //window.location.href = "http://localhost:8080/inbox";
 }
 
 
