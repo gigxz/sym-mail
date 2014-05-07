@@ -5,7 +5,6 @@
     <meta name="uid" content="{{uid}}">
     <meta name="boxname" content="{{boxname}}">
     <title>Compose</title>
-
  
     <link rel="stylesheet" href="/style/compose_style.css" type="text/css" />
     <link rel="stylesheet" href="/style/main_style.css" type="text/css"/>
@@ -13,12 +12,9 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-    <script src="http://www.appelsiini.net/download/jquery.viewport.js"></script>
+    <script type="text/javascript" src="/js/jquery.autosize.js"></script>
     <script type="text/javascript" src="/js/compose_script.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
-    
-
-    
 
 </head>
 <body>
@@ -31,7 +27,7 @@
 
 <!--BUTTONS-->
 <div class="nav-buttons">
-    <div id="group1" class="firstButtonGroup white-border">
+    <div id="group1" class="white-border">
 		<div id="group1group1" type="button" class="btn btn-primary btn-block" onclick='followLink("inbox")'>Inbox</div>
 		<div id="group1group2" type="button" class="btn btn-primary btn-block" onclick='sendMail(this)'>Send</div>
 		<div id="group1group3" type="button" class="btn btn-primary btn-block" onclick='saveDraft(this)'>Save Draft</div>
@@ -71,7 +67,7 @@
                 </div>
             </td>
 			<td class="right-col">
-				<div id="group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection()">Select</div>
+				<div id="group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection(0)">Select</div>
 			</td>
         </tr>
     </table>

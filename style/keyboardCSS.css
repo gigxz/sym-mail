@@ -11,9 +11,9 @@ body, html {
 }
 
 #keyboard-container {
-    padding:10px;
-    width:40em;
-    height:13em;
+    padding:8px;
+    width:720px;
+    height:240px;
     background-color: #E6E6E6;/
 }
 

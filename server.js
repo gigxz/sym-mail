@@ -193,8 +193,13 @@ app.post('/save', function(request, response){
 app.post('/sendmail', function(request, response) {
   //console.log(request.body.subjectText + ' ' + request.body.toText + ' ' + request.body.fromText)
   // Create a SMTP transport object
-  from = "speakyourmail@gmail.com";
-  console.log("calling sendmail to  " + request.body.toText);
+  var from = "speakyourmail@gmail.com";
+  // var fromObj = [];
+  // var fromField = [];
+  // fromField['name'] = 'SYMname';
+  // fromField['address'] = "speakyourmail@gmail.com";
+  // fromObj.push(fromField);
+
   // Message object
   var message = {
       // sender info
@@ -206,7 +211,9 @@ app.post('/sendmail', function(request, response) {
       // Subject of the message
       subject: request.body.subjectText, //
 
-      text: request.body.bodyText
+      text: request.body.bodyText,
+
+      html: request.body.bodyText
   };
 
   sendmail(message);
@@ -477,22 +484,10 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
           //uid = attrs.uid;
         });
         msg.once('end', function() {
-        	  
-  //           	headers = Imap.parseHeader(buffer);    	
-  //       	  	messages.push({
-  //         		from: headers.from,
-  //         		to: headers.to,
-  //         		subject: headers.subject,
-  //         		date: headers.date,
-  //         		uid: uid
-  //         	});
-  //          	num++;
-           	
         	var mailparser = new MailParser();
         	mailparser.on('end', function(mail_object) {
-            console.log("subject: "+mail_object.subject + "date: " + mail_object.date);
     				messages.unshift({
-    					sender: mail_object.from[0].name,
+    					sender: mail_object.from[0],
     					subject: mail_object.subject,
     					message: mail_object.text,
     // 					to: mail_object.to[0].name,
@@ -513,11 +508,6 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
       f.once('end', function() {
       // response.send(messages);
         console.log('Done fetching all messages!');
-        
-  // 	messages.unshift({
-  //     	size: num
-  //     });
-  // 	response.send(messages);
   	
         imap.end();
       });

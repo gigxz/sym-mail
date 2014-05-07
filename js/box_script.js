@@ -3,17 +3,22 @@ var pageNumber,
     maxPages;
 
 window.addEventListener('load', function(){
-    maxPages = 100; //TODO delete
+    maxPages = 10; //TODO delete
     $('#loadingScreen').fadeIn(0);
     cyclingOn(0); // stop cycling
     get_box_data_page(1, function(data) {
-        //totalNumber = data.total;
-        //maxPages = totalNumber/6;
-        replaceBoxMessages(data, function() {
-            // everything loaded, start cycling
+        if(data) {
+            //totalNumber = data.total;
+            //maxPages = totalNumber/6;
+            replaceBoxMessages(data, function() {
+                // everything loaded, start cycling
+                $('#loadingScreen').fadeOut(300);
+                cyclingOn(1); 
+            });
+        }
+        else {
             $('#loadingScreen').fadeOut(300);
-            cyclingOn(1); 
-        });
+        }
     });
 }, false);
 
@@ -21,8 +26,7 @@ window.addEventListener('load', function(){
 /* GET DATA ON A SPECIFIC PAGE */
 function get_box_data_page(pgNum, callback) {
     var box = 'http://localhost:8080/getemails/' + meta('boxname')+'/'+pgNum;
-    console.log("REQUESTING PAGE "+pgNum);
-    make_request(box, function(e) {
+    make_request(box, function() {
         if (this.status == 200) {       
             var content = this.responseText;
             var data = JSON.parse(content);
@@ -30,6 +34,7 @@ function get_box_data_page(pgNum, callback) {
             callback(data);
         } else {
             alert("Feed Request was invalid.");
+            callback(null);
         }               
     });  
 }
@@ -42,7 +47,6 @@ function setPageIndicator() {
 function scrollBox(dir) {
     // page up
     if(dir===1) {
-        console.log("CALLING PAGE UP");
         cyclingOn(0); // stop cycling
         get_box_data_page(pageNumber-1, function(data) {
             //totalNumber = data.total;
@@ -56,12 +60,10 @@ function scrollBox(dir) {
 
     // page down
     else if(dir === -1) {
-        console.log("CALLING PAGE DOWN");
         cyclingOn(0); // stop cycling
         get_box_data_page(pageNumber+1, function(data) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
-            
             replaceBoxMessages(data, function() {
                 cyclingOn(1); // everything loaded, start cycling
             });
@@ -79,23 +81,28 @@ function replaceBoxMessages(newMessages, callback) {
 	//alert("Replace Inbox Messages");
     $('.inboxmsg').each(function(index, obj) {
         $(this).attr('uid', newMessages[index].uid);
-
+        
         // replace sender
-        $(this).find('.sender').text(newMessages[index].sender);
+        var from = newMessages[index].sender.address;
+        var name = newMessages[index].sender.name;
+        if(name.length>0)
+            from = name;
+        $(this).find('.sender').text(from);
 
         // replace subject
+        $(this).find('.subject').empty();
         $(this).find('.subject').text(newMessages[index].subject);
 
         // replace timestamp
-        var timestamp = newMessages[index].timestamp
+        var timestamp = newMessages[index].timestamp;
         $(this).find('.timestamp').text(getFormattedDate(timestamp));
 
         // replace message
         var htmlMSG = newMessages[index].message;
+        $(this).find('.message').empty();
         $(this).find('.message').text($.trim(htmlMSG));
         callback();
     }).promise().done(function() {
-
         // reset page indicator and arrows
         setPageIndicator();
         showHideNavigationArrows();
@@ -103,13 +110,6 @@ function replaceBoxMessages(newMessages, callback) {
     });
 }
 
-
-/* hide arrows while next page is loading */
-function hideArrows() {
-    // $('.arrowup').addClass('hide');
-    // $('.arrowdown').addClass('hide');
-    // $('.arrows').addClass('hide');
-}
 
 
 function showHideNavigationArrows() {
@@ -143,6 +143,10 @@ function showHideNavigationArrows() {
 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
     'Oct', 'Nov', 'Dec'];
 function getFormattedDate(timestamp) {
+    if(!timestamp)
+        return '';
+    if(timestamp.length<16)
+        return timestamp;
     var month = parseInt(timestamp.substring(5,7));
     var day = parseInt(timestamp.substring(8,10));
     var year = parseInt(timestamp.substring(0, 4));

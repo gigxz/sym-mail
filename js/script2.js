@@ -9,10 +9,8 @@ var groupNumber = 0,
 /* sets up for cycling but does not start it */
 window.addEventListener('load', function(){
     $(window).focus();
-    //set font size
-    fontSize = getQueryVariable(window.location.search, 'size');
-    if(fontSize==='')
-        fontSize='20'; //default
+    //set font size TODO
+    fontSize = '16';
     document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 
     addTransitions();
@@ -60,13 +58,11 @@ function showFontValue(newValue) {
 }
 
 function setFontSize(val) {
-    //console.log("setting font size var to "+val);
     fontSize = val;
 	document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 }
 
 function setCycleTime(val) {
-	//console.log("setting cycle time var to "+val*1000);
 	waitTime = val*1000;
 }
 
@@ -95,11 +91,10 @@ var clickHandler = function() {
                 if (stringGroup === '#goBack') {
                     // ex. compose checks special things if goback is clicked
                     document.getElementById('goBack').click();
-
                     groupNumber = 0; 
                     id = id.slice(0, -6);
                     if (id.length < 2) {
-                        window.history.back();
+                        window.location.href = document.referrer;
                     }
                     intervalFunction = setInterval(cycle, waitTime);
                 }
@@ -121,8 +116,6 @@ var clickHandler = function() {
                                 document.getElementById(singleChildID).click();
                             }
                             else {
-                                //CLICK ON ITEM
-                                //TODO FIX THIS BUG WTF
                                 if(elementExists(id+groupNumber)) {
                                     document.getElementById(id+groupNumber).click();
                                 }
@@ -136,8 +129,6 @@ var clickHandler = function() {
     
                     }
                 }
-                 
-                //console.log("CLICK IN SCRIPT2: "+id+groupNumber);
            }
         });
 };
@@ -263,7 +254,6 @@ function make_request(url, callback) {
     console.log("Making a http request to: " + url);
     request.addEventListener('load', callback, false);  
     request.send(null);
-    //return request;
 }
 
 function meta(name) {
