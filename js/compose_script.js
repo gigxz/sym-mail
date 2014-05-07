@@ -36,21 +36,28 @@ $(window).load(function() {
 		$('#pathHeader').text('Compose');
 	}
 
+
+    $("#write").on('change keyup paste', function() {
+        showHideScrollArrows();
+    });
+
+    $("#toTextArea").on('change keyup paste', function() {
+        $(this).height(this.scrollHeight);
+
+    });
+
+    $("#subjectText").on('change keyup paste', function() {
+        $(this).height(this.scrollHeight);
+
+    });
+
 });
 
-$("#write").on('change keyup paste', function() {
-	showHideScrollArrows();
-});
 
-$("#toTextArea").on('change keyup paste', function() {
-    this.style.height = 0;
-    this.style.height = this.scrollHeight + 'px';
-});
 
 
 
 function get_reply_data(callback) {   
-	//console.log("REQUESTING REPLY DATA FOR  "+meta('boxname')+'/'+meta('uid'));
     make_request('http://localhost:8080/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
         if (this.status == 200) {    
 			var content = this.responseText;
@@ -59,8 +66,7 @@ function get_reply_data(callback) {
 			$("#from").html();
 
 			$("#toTextArea").html(data[0].from.address);
-			//console.log("from: ");
-			//console.log(data[0].from.name+","+data[0].from.address);
+
 			recipients.push(new Recipient(data[0].from.name, data[0].from.address));
 			$("#subjectText").html("Re: " + data[0].subject);
 
@@ -92,11 +98,8 @@ function submitEmail() {
 
 function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
-        console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
         window.location.href = 'http://localhost:8080/';
     }); 
-    
-   // window.history.go(0);
 
 }
 
@@ -120,7 +123,6 @@ function saveDraft(msg){
 
 
 function sendMail(msg){
-    console.log("SENDING");
     var request = new XMLHttpRequest();
     url = 'http://localhost:8080/sendmail';
     request.open('POST', url, true);
@@ -147,7 +149,6 @@ function Recipient(nickname, email) {
 }
 var pageNumber;
 function expandToSelection(num){
-	console.log("selecting");
 	pageNumber = num; //this is what page you are on
 
 
@@ -159,14 +160,11 @@ function expandToSelection(num){
 	url = 'http://localhost:8080/addressBook/' + offset; 
     make_request(url, function(e) {
     	var content = this.responseText; 
-		//console.log(content);
 		var abook = JSON.parse(content); 
 		abook = abook['contacts'];
-		//console.log(abook)
 		var count = 0; 
 		var recipient = $( ".recipient" );
 		if (abook.length<recipient.length){
-			//console.log("need to hide");
 			$(".recipient-container:last").addClass('hide');
 			$(".email-address:last").addClass('hide');
 			$('.seeNextRecip').addClass('hide');
@@ -195,7 +193,6 @@ function expandToSelection(num){
     newID = newID.substring(0, newID.length-1);
     id = newID;
     groupNumber = 0;
-    console.log("SETTING TO "+id+groupNumber);
 }
 
 function goBackClicked() {
@@ -213,7 +210,6 @@ function toggleRecipient(obj) {
 		addr = name;
 	}
 	var thisRecipient = new Recipient(name, addr);
-	console.log('toggling: '+thisRecipient.email);
 
 	//ALREADY IN LIST
 	if($(obj).find('.recipient').hasClass('active')) {
@@ -264,8 +260,6 @@ function cycleRecipients(dir) {
 /**** KEYBOARD ****/
 
 function expandKeyboard(textAreaID){
-    console.log('EXPANDING KEYBOARD FOR '+textAreaID);
-
     if(textAreaID === "write") {
         $('.writeSubjectDiv').addClass('hide');
 		$('.writeRecipientDiv').addClass('hide');

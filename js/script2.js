@@ -9,10 +9,8 @@ var groupNumber = 0,
 /* sets up for cycling but does not start it */
 window.addEventListener('load', function(){
     $(window).focus();
-    //set font size
-    fontSize = getQueryVariable(window.location.search, 'size');
-    if(fontSize==='')
-        fontSize='20'; //default
+    //set font size TODO
+    fontSize = '16';
     document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 
     addTransitions();
@@ -60,13 +58,11 @@ function showFontValue(newValue) {
 }
 
 function setFontSize(val) {
-    //console.log("setting font size var to "+val);
     fontSize = val;
 	document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 }
 
 function setCycleTime(val) {
-	//console.log("setting cycle time var to "+val*1000);
 	waitTime = val*1000;
 }
 
@@ -97,7 +93,6 @@ var clickHandler = function() {
                     document.getElementById('goBack').click();
                     groupNumber = 0; 
                     id = id.slice(0, -6);
-                    console.log("should go back? "+id);
                     if (id.length < 2) {
                         window.location.href = document.referrer;
                     }

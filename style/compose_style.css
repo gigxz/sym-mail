@@ -74,10 +74,10 @@ table.compose-table td {
 
 /* IFRAME */
 #keyboardFrame {
-	width:37.6em;
-	height:13em;
+	width:740px;
+	height:260px;
 	overflow:hidden;
-	margin-left:10px;
+	margin-left:20px;
 }
 
 

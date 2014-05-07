@@ -120,9 +120,7 @@ var keyIDexists = function(idToCheck) {
 }
 
 function typeKey(keyID) {
-//    console.log(keyID);
     if(keyID.substring(keyID.length-1, keyID.length) === '0') {
-        console.log(keyID);
         return;
     }
     var textAreaID = window.parent.document.getElementById('keyboardFrame').getAttribute('name');
@@ -137,9 +135,8 @@ function typeKey(keyID) {
         capslock = false;
      
     var $this = $('#'+keyID+' li');
-    //console.log($this);
     var character = $this.html(); // If it's a lowercase letter, nothing happens to this variable
-    //console.log(character);
+
     // Shift key
     if ($this.hasClass('left-shift')) {
         $('.letter').toggleClass('uppercase');

@@ -485,17 +485,6 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
           //uid = attrs.uid;
         });
         msg.once('end', function() {
-        	  
-  //           	headers = Imap.parseHeader(buffer);    	
-  //       	  	messages.push({
-  //         		from: headers.from,
-  //         		to: headers.to,
-  //         		subject: headers.subject,
-  //         		date: headers.date,
-  //         		uid: uid
-  //         	});
-  //          	num++;
-           	
         	var mailparser = new MailParser();
         	mailparser.on('end', function(mail_object) {
     				messages.unshift({
@@ -520,11 +509,6 @@ app.get('/getemails/:boxname/:pagenum', function(request, response) {
       f.once('end', function() {
       // response.send(messages);
         console.log('Done fetching all messages!');
-        
-  // 	messages.unshift({
-  //     	size: num
-  //     });
-  // 	response.send(messages);
   	
         imap.end();
       });

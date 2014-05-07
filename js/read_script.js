@@ -36,8 +36,6 @@ $(window).bind('resize', function() {
 function deleteMessage(inboxmsg) {
     make_request('http://localhost:8080/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
         //console.log("Message" + $(inboxmsg).attr('uid') + " deleted");
-        //window.location.href = 'http://localhost:8080/';
-        
     }); 
     window.location.href = document.referrer;
 }
@@ -72,6 +70,5 @@ function get_message_data(callback) {
 
 
 function reply() {
-    console.log("REPLY! REDIRECTING TO : "+'/compose/'+meta('boxname')+'/'+meta('uid'))
     window.location.href = '/compose/'+meta('boxname')+'/'+meta('uid');
 }
