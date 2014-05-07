@@ -138,7 +138,6 @@ function sendMail(msg){
     	"bodyText": document.getElementById("write").value
     }));
     window.location.href = "http://localhost:8080/inbox";
-    //return request;
 }
 
 
@@ -175,6 +174,13 @@ function expandToSelection(num){
 			} else {
 				recipient[i].innerHTML = abook[i]['email']; 
 			}
+
+            // if in recipients list, make active
+            for(var k in recipients) {
+                if(recipients[k].email === abook[i]['email']) {
+                    $(recipient[i]).addClass('active');
+                }
+            }
 		};
 
 		var emails = $( ".email-address" ); 
@@ -224,13 +230,13 @@ function toggleRecipient(obj) {
 	// make recipients list into comma-separated string
 	var recipString = "";
 	for(var j = 0; j < recipients.length; j++) {
-		recipString += recipients[j].nickname;
+		recipString += recipients[j].email;
 		if(j!=recipients.length-1) {
 			recipString += ", ";
 		}
 	}
 	$('#toTextArea').text(recipString);
-	$('#toTextArea').change(); //TODO resize
+	//$('#toTextArea').change(); 
 }
 
 function removeRecipient(email) {
@@ -245,7 +251,6 @@ function removeRecipient(email) {
 	} 
 }
 
-//TODO cycling through recipients
 function cycleRecipients(dir) {
     if(dir === 0) {
         expandToSelection(pageNumber-1);
