@@ -2,8 +2,11 @@
 /* on load */
 $(window).load(function() {
     // IF WRITING REPLY (or draft?? TODO)
-	if(meta('uid').length > 0) {
-        // loading screen
+//	if(meta('uid').length > 0) {
+
+    // IF WRITING REPLY
+	if(meta('boxname').length > 0) {
+         // loading screen
         $('#loadingScreen').fadeIn(0);
 
 		get_reply_data(function(subjText) {
@@ -38,21 +41,24 @@ $(window).load(function() {
     /* event handlers */
     $("#toTextArea").on('change keyup paste', function() {
         var e = document.getElementById('toTextArea');
-        if(e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth) {
+        if(e.scrollHeight > e.clientHeight) {
             $(this).height(e.scrollHeight+'px');
         }
+        setTimeout(saveDraft(this), 3000); 
     });
 
     $("#subjectText").on('change keyup paste', function() {
         var e = document.getElementById('subjectText');
-        if(e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth) {
+        if(e.scrollHeight > e.clientHeight) {
             $(this).height(e.scrollHeight+'px');
         }
+        setTimeout(saveDraft(this),3000); 
     });
 
 
     $("#write").on('change keyup paste', function() {
         showHideScrollArrows();
+        setTimeout(saveDraft(this), 3000); 
     });
 
     $(window).bind('resize', function() {
@@ -99,15 +105,17 @@ function submitEmail() {
 }
 
 function deleteMessage(inboxmsg) {
-    make_request('/delete/' + $(inboxmsg).attr('uid'), function(e) {
-        window.location.href = 'http://localhost:8080/';
-    }); 
 
+    make_request('http://localhost:8080/delete/' + meta("uid"), function(e) {
+
+    }); 
+    window.location.href = 'http://localhost:8080/';
 }
 
 function saveDraft(msg){
 	var request = new XMLHttpRequest();
-    url = '/save';
+
+    url = 'http://localhost:8080/save';
     request.open('POST', url, true);
    	request.setRequestHeader('Content-Type', "application/json"); 
     var emailString = document.getElementById("toTextArea").value;
@@ -117,9 +125,10 @@ function saveDraft(msg){
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
-    	"bodyText": document.getElementById("write").value
+    	"bodyText": document.getElementById("write").value, 
+        "draft_id": meta("draft_id")
     }));
-    window.location.href = "http://localhost:8080/inbox";
+    //window.location.href = "http://localhost:8080/inbox";
 }
 
 
