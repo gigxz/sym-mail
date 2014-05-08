@@ -7,7 +7,7 @@ window.addEventListener('load', function(){
     $('#loadingScreen').fadeIn(0);
     cyclingOn(0); // stop cycling
     get_box_data_page(1, function(data) {
-        if(data) {
+        if(data && data.length > 0) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
             replaceBoxMessages(data, function() {
@@ -18,6 +18,7 @@ window.addEventListener('load', function(){
         }
         else {
             $('#loadingScreen').fadeOut(300);
+            console.log("NOTHING TO RETRIEVE");
         }
     });
 }, false);
@@ -44,31 +45,26 @@ function setPageIndicator() {
     $('#pageIndicator').text(string);
 }
 
+// dir is 1 for next page, -1 for previous page
 function scrollBox(dir) {
-    // page up
-    if(dir===1) {
-        cyclingOn(0); // stop cycling
-        get_box_data_page(pageNumber-1, function(data) {
+    var newPage = pageNumber + dir;
+
+    cyclingOn(0); // stop cycling
+
+    get_box_data_page(newPage, function(data) {
+        if(data && data.length > 0) {
             //totalNumber = data.total;
             //maxPages = totalNumber/6;
             
             replaceBoxMessages(data, function() {
                 cyclingOn(1); // everything loaded, start cycling
             });
-        });
-    }
-
-    // page down
-    else if(dir === -1) {
-        cyclingOn(0); // stop cycling
-        get_box_data_page(pageNumber+1, function(data) {
-            //totalNumber = data.total;
-            //maxPages = totalNumber/6;
-            replaceBoxMessages(data, function() {
-                cyclingOn(1); // everything loaded, start cycling
-            });
-        });
-    }
+        }
+        else {
+            console.log("ERROR retrieved no data for pg");
+            cyclingOn(1);
+        }
+    });
 }
 
 function readEmail(inboxmsg) {
@@ -79,6 +75,7 @@ function readEmail(inboxmsg) {
 /* given a list of 6 new messages, replace what's visible in the inbox */
 function replaceBoxMessages(newMessages, callback) {
 	//alert("Replace Inbox Messages");
+
     $('.inboxmsg').each(function(index, obj) {
         $(this).attr('uid', newMessages[index].uid);
         

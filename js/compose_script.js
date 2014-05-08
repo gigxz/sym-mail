@@ -2,7 +2,8 @@
 /* on load */
 $(window).load(function() {
     // IF WRITING REPLY (or draft?? TODO)
-//	if(meta('uid').length > 0) {
+    console.log(meta('uid')+":"+meta('boxname'));
+	//if(meta('uid').length > 0) {
 
     // IF WRITING REPLY
 	if(meta('boxname').length > 0) {
@@ -10,22 +11,25 @@ $(window).load(function() {
         $('#loadingScreen').fadeIn(0);
 
 		get_reply_data(function(subjText) {
-			if(subjText && subjText.length > 30) {
-				subjText = subjText.substring(0, 30 + "...");
-			}
-			var header = "Inbox > ";
-	        if(document.referrer.indexOf("drafts") > -1) {
-	            header = "Drafts > ";
-	        }
-	        if(subjText) {
-	            header += subjText;
-	        }
-	        else {
-	            header += "Read Message";
-	        }
-	        header += " > Reply";
-	        $('#pathHeader').text(header);
+            var header;
 
+            // IS A DRAFT (new or existing)
+            if(!subjText  || document.referrer.indexOf("drafts") > -1) {
+                header = "Compose";
+            }
+            else {
+                // IS A REPLY
+    			if(subjText && subjText.length > 30) {
+    				subjText = subjText.substring(0, 30) + "...";
+    			}
+                else if (subjText === '') {
+                    // handle ('no subject')
+                }
+    			header = "Inbox > " +subjText + " > Reply";
+            }
+	        
+
+            $('#pathHeader').text(header);
             $('#loadingScreen').fadeOut(300);
 	        showHideScrollArrows();
             // turn on cycling once everything has loaded
@@ -77,6 +81,12 @@ function get_reply_data(callback) {
 			var content = this.responseText;
 			var data = JSON.parse(content);
 
+            // nothing returned, meaning this is a brand new draft
+            if(data.length < 1) {
+                callback();
+                return;
+            }
+            // console.log(data.length);
 			$("#from").html();
 
 			$("#toTextArea").val(data[0].from.address);
