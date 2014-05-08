@@ -5,18 +5,17 @@ body, html {
 #settings {
 	float: left;
 	display: block;
-	margin-top:35px;
+	margin-top:20px;
+	margin-left: 20px;
 	height: 490px;
-	width: 680px;
-	margin-left: 210px;
-	border: 2px solid white;
+	width: 660px;
 }
 
 #plus {
 	height:100%;
-	width:50%;
+	width:40%;
 
-	float:left;
+	margin: 0 auto;
 
 	font-size:30px;
 	border:2px solid white;
@@ -31,7 +30,33 @@ body, html {
 	width:8em;
 }
 
+#nameBox {
+	width:45%;
+}
+
+#addressBox {
+	width:45%;
+}
+
 input[type="range"] {
 	display: float left;
 	width: 170px;
 }
+
+#contact-notifiction {
+	min-width: 200px;
+	max-width: 400px;
+	min-height: 20px;
+	line-height: 20px;
+	margin:0 auto;
+	padding:4px;
+	background-color: rgba(0,0,0,.2);
+	border-radius: 3px;
+	text-align: center;
+
+	display:none;
+}
+
+
+
+

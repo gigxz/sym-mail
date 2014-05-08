@@ -4,7 +4,8 @@ var groupNumber = 0,
     intervalFunction,    
     waitTime = 1000,
     fontSize,
-    cyclingActive = false;
+    cyclingActive = false,
+    selectionKeyCode = 32;
 
 /* sets up for cycling but does not start it */
 window.addEventListener('load', function(){
@@ -46,31 +47,12 @@ function addTransitions() {
         $(this).css({transition: 'border 0.5s ease'});
     });
 }
-function showTimeValue(newValue) {
-	document.getElementById("time").innerHTML=newValue;
-	setCycleTime(newValue);
-}
-
-function showFontValue(newValue) {
-	document.getElementById("size").innerHTML=newValue;
-	// update actual font
-	setFontSize(newValue);
-}
-
-function setFontSize(val) {
-    fontSize = val;
-	document.body.style.setProperty('font-size', fontSize+'px', 'important' );
-}
-
-function setCycleTime(val) {
-	waitTime = val*1000;
-}
 
 var clickHandler = function() {
         // prevent default behavior
         // (i.e. page scrolling down when you press space)
         $(document).keydown(function(e) {
-            if(e.keyCode === 32) {
+            if(e.keyCode === selectionKeyCode) {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 e.preventDefault();
@@ -79,7 +61,7 @@ var clickHandler = function() {
         });
 
         $(document).keyup(function(e) {
-            if (e.keyCode === 32){
+            if (e.keyCode === selectionKeyCode){
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 e.preventDefault(); 
@@ -262,3 +244,29 @@ function meta(name) {
         return tag.content;
     return '';
 }
+
+
+function validateEmail(email) { 
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
+// function showTimeValue(newValue) {
+//  document.getElementById("time").innerHTML=newValue;
+//  setCycleTime(newValue);
+// }
+
+// function showFontValue(newValue) {
+//  document.getElementById("size").innerHTML=newValue;
+//  // update actual font
+//  setFontSize(newValue);
+// }
+
+// function setFontSize(val) {
+//     fontSize = val;
+//  document.body.style.setProperty('font-size', fontSize+'px', 'important' );
+// }
+
+// function setCycleTime(val) {
+//  waitTime = val*1000;
+// }

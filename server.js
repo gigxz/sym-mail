@@ -234,6 +234,7 @@ app.get('/setAddress/:email/:toEmail/:nickname', function(request, response){
   var toEmail = request.params.toEmail; 
   var nickname = request.params.nickname; 
   addressBookEntry(fromEmail, toEmail, nickname); 
+  response.send(null); //maybe send whether or not it was added (i.e. if duplicate)
 }); 
 
 app.get('/addressBook/:offset', function(request, response){
@@ -243,6 +244,7 @@ app.get('/addressBook/:offset', function(request, response){
   var contacts = '{ "contacts": ['; 
   var myEmail = "speakyourmail@gmail.com";
   q = conn.query(getMostCommonAddresses, [myEmail, 4, offset], function(err, result){
+    //TODO if 'result' is undefined (i got this error)
     result.rows.forEach(function(row){
         var nickname = row.recipientNickname; 
         contacts += '{"email": "' + row.recipientEmail + '",  "nickname": "' + row.recipientNickname + '"},'; 

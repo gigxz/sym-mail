@@ -1,8 +1,7 @@
-var recipients = [];
 
 /* on load */
 $(window).load(function() {
-    // IF WRITING REPLY
+    // IF WRITING REPLY (or draft?? TODO)
 	if(meta('uid').length > 0) {
         // loading screen
         $('#loadingScreen').fadeIn(0);
@@ -36,19 +35,28 @@ $(window).load(function() {
 		$('#pathHeader').text('Compose');
 	}
 
+    /* event handlers */
+    $("#toTextArea").on('change keyup paste', function() {
+        var e = document.getElementById('toTextArea');
+        if(e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth) {
+            $(this).height(e.scrollHeight+'px');
+        }
+    });
+
+    $("#subjectText").on('change keyup paste', function() {
+        var e = document.getElementById('subjectText');
+        if(e.scrollHeight > e.clientHeight || e.scrollWidth > e.clientWidth) {
+            $(this).height(e.scrollHeight+'px');
+        }
+    });
+
 
     $("#write").on('change keyup paste', function() {
         showHideScrollArrows();
     });
 
-    $("#toTextArea").on('change keyup paste', function() {
-        $(this).height(this.scrollHeight);
-
-    });
-
-    $("#subjectText").on('change keyup paste', function() {
-        $(this).height(this.scrollHeight);
-
+    $(window).bind('resize', function() {
+        showHideScrollArrows();
     });
 
 });
@@ -58,17 +66,16 @@ $(window).load(function() {
 
 
 function get_reply_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
+    make_request('/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
         if (this.status == 200) {    
 			var content = this.responseText;
 			var data = JSON.parse(content);
 
 			$("#from").html();
 
-			$("#toTextArea").html(data[0].from.address);
+			$("#toTextArea").val(data[0].from.address);
 
-			recipients.push(new Recipient(data[0].from.name, data[0].from.address));
-			$("#subjectText").html("Re: " + data[0].subject);
+			$("#subjectText").val("Re: " + data[0].subject);
 
    			$("#replyText").html(data[0].body);
 
@@ -85,11 +92,6 @@ function get_reply_data(callback) {
 }
 
 
-// when window is resized, check again if you need arrows
-$(window).bind('resize', function() {
-    showHideScrollArrows();
-});
-
 
 function submitEmail() {
 	var mainform = document.getElementById('mainform');
@@ -97,7 +99,7 @@ function submitEmail() {
 }
 
 function deleteMessage(inboxmsg) {
-    make_request('http://localhost:8080/delete/' + $(inboxmsg).attr('uid'), function(e) {
+    make_request('/delete/' + $(inboxmsg).attr('uid'), function(e) {
         window.location.href = 'http://localhost:8080/';
     }); 
 
@@ -105,14 +107,13 @@ function deleteMessage(inboxmsg) {
 
 function saveDraft(msg){
 	var request = new XMLHttpRequest();
-    url = 'http://localhost:8080/save';
+    url = '/save';
     request.open('POST', url, true);
    	request.setRequestHeader('Content-Type', "application/json"); 
-   	var emailString = '';
-   	recipients.forEach(function(x){
-   		emailString += x.email + ','; 
-   	});
-   	emailString = emailString.slice(0,-1);
+    var emailString = document.getElementById("toTextArea").value;
+    emailString = emailString.replace(/\s+/g, '');
+
+
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
@@ -124,28 +125,35 @@ function saveDraft(msg){
 
 function sendMail(msg){
     var request = new XMLHttpRequest();
-    url = 'http://localhost:8080/sendmail';
+    url = '/sendmail';
     request.open('POST', url, true);
    	request.setRequestHeader('Content-Type', "application/json"); 
-   	var emailString = '';
-   	recipients.forEach(function(x){
-   		emailString += x.email + ','; 
-   	});
-   	emailString = emailString.slice(0,-1);
+
+
+
+   	var emailString = '';    
+    emailString = document.getElementById("toTextArea").value;
+    emailString = emailString.replace(/\s+/g, '');
+
+    //verify email addresses
+    var listToVerify = emailString.split(',');
+    for(item in listToVerify) {
+        if(!(validateEmail(listToVerify[item]))) {
+            console.log("INVALID EMAIL: "+listToVerify[item]);
+            return;
+        }
+    }
+    //TODO CHECK, DONT SEND IF STRING IS EMPTY
+    console.log("SENDING TO "+emailString);
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value
     }));
-    window.location.href = "http://localhost:8080/inbox";
+    //window.location.href = "http://localhost:8080/inbox";
 }
 
 
-/* recipients obj */
-function Recipient(nickname, email) {
-	this.nickname = nickname;
-	this.email = email;
-}
 var pageNumber;
 function expandToSelection(num){
 	pageNumber = num; //this is what page you are on
@@ -156,7 +164,7 @@ function expandToSelection(num){
     $('#recipientBoxRow').find('.hide').removeClass('hide');
 
 	var offset = 0 + parseInt(pageNumber);
-	url = 'http://localhost:8080/addressBook/' + offset; 
+	url = '/addressBook/' + offset; 
     make_request(url, function(e) {
     	var content = this.responseText; 
 		var abook = JSON.parse(content); 
@@ -176,11 +184,21 @@ function expandToSelection(num){
 			}
 
             // if in recipients list, make active
-            for(var k in recipients) {
-                if(recipients[k].email === abook[i]['email']) {
+            var emailString = '';    
+            emailString = document.getElementById("toTextArea").value;
+            emailString = emailString.replace(/\s+/g, '');
+            var emailList = emailString.split(',');
+
+
+            for(var k in emailList) {
+                if(emailList[k].toLowerCase() === abook[i]['email'].toLowerCase()) {
                     $(recipient[i]).addClass('active');
                 }
+                else {
+                    $(recipient[i]).removeClass('active');
+                }
             }
+
 		};
 
 		var emails = $( ".email-address" ); 
@@ -208,47 +226,50 @@ function goBackClicked() {
     }
 }
 
+// toggle recipient in selection
 function toggleRecipient(obj) {
 	var name = $(obj).text().trim();
 	var addr = $(obj).parent().find('.email-address').text();
+
 	// if no email address, name is email address
 	if(addr === "") {
 		addr = name;
 	}
-	var thisRecipient = new Recipient(name, addr);
+    var added = true;
 
-	//ALREADY IN LIST
 	if($(obj).find('.recipient').hasClass('active')) {
 		$(obj).find('.recipient').removeClass('active');
-		removeRecipient(thisRecipient.email);
+        added=false;
 	}
-	else { //NOT ALREADY IN LIST
+	else {
 		$(obj).find('.recipient').addClass('active');
-		recipients.push(thisRecipient);
 	}
 
 	// make recipients list into comma-separated string
-	var recipString = "";
-	for(var j = 0; j < recipients.length; j++) {
-		recipString += recipients[j].email;
-		if(j!=recipients.length-1) {
-			recipString += ", ";
-		}
-	}
-	$('#toTextArea').text(recipString);
-	//$('#toTextArea').change(); 
-}
+    var emailString = '';    
+    emailString = document.getElementById("toTextArea").value;
 
-function removeRecipient(email) {
-	var indexToRemove = -1;
-	for(var i in recipients) {
-		if(recipients[i].email === email) {
-			indexToRemove = i;
-		}
-	}
-	if(indexToRemove != -1) {
-		recipients.splice(indexToRemove, 1);
-	} 
+    if(added) {
+        // add email to the string
+        var start = (emailString==='') ? '' : ', ';
+        emailString+=start+addr;
+    }
+    else {
+        // remove email from the string
+        emailString = emailString.replace(/\s+/g, '');
+        var emailList = emailString.split(',');
+        var newEmailString = '';
+        for(var k in emailList) {
+            if(!(emailList[k].toLowerCase() === addr.toLowerCase())) {
+                newEmailString+=emailList[k]+', ';
+            }
+        }
+        emailString = newEmailString.substring(0, newEmailString.length-2);
+
+    }
+
+	$('#toTextArea').val(emailString);
+    $('#toTextArea').change();
 }
 
 function cycleRecipients(dir) {
@@ -281,9 +302,10 @@ function expandKeyboard(textAreaID){
         document.getElementById("keyboardFrame").contentWindow.focus();
     }
 }
-function hideKeyboard() {
 
+function hideKeyboard() {
     if (!$('#keyboardFrame').hasClass("hide")){
+
         $('.writeMessageDiv').removeClass('hide');
         $('.writeSubjectDiv').removeClass('hide');
 		$('.writeRecipientDiv').removeClass('hide');

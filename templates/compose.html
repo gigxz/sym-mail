@@ -12,7 +12,6 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-    <script type="text/javascript" src="/js/jquery.autosize.js"></script>
     <script type="text/javascript" src="/js/compose_script.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
 
@@ -61,13 +60,16 @@
             <td class="left-col">
                 <span class="label label-default">To</span>
             </td>
-            <td class="middle-col">
-                <div id="group2group1group1" class="compose-table requiresKeyboard white-border">
+
+			<td class="right-col">
+
+                <div id="group2group1group1" class="requiresKeyboard white-border to-text-container">
                     <textarea class="textBox" id="toTextArea"></textarea>
                 </div>
-            </td>
-			<td class="right-col">
-				<div id="group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection(0)">Select</div>
+
+				<div id="group2group1group2" type="button" class="btn btn-primary selectButton" onclick="expandToSelection(0)">
+                    Select
+                </div>
 			</td>
         </tr>
     </table>

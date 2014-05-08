@@ -9,6 +9,7 @@
     
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/settings_script.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
     
 </head>
@@ -17,7 +18,7 @@
 <!--BUTTONS-->
 <div class="nav-buttons">
 	<div class="btn btn-primary btn-block" onclick='followLink("inbox")'>Inbox</div>
-    <div class="btn btn-primary btn-block">Back</div>
+    <!--<div class="btn btn-primary btn-block">Back</div-->
 </div>
 
 
@@ -25,36 +26,39 @@
 
 <!--SETTINGS-->
 <div id="settings">
-	<div class="white-border">
-	    <table class="table">
-	        <!-- ADD CONTACT field -->
-	        <tr>
-	            <td class="left-col"><span class="label label-default">Add Contact</span></td>
-	            <td class="right-col" id="to">
-					<textarea>First Last</textarea>
-					<textarea><firstlast@example.com></textarea>
-					<div class="btn btn-primary btn-block white" id="plus"><span class="glyphicon glyphicon-plus"></span></div>
-				</td>
-	        </tr>
-    		<!-- FONT SIZE field -->
-	    	<tr>
-				<td class="left-col"><span class="label label-default">Font Size</span></td>
-	            <td class="right-col">
-					<input type="range" name="fontsize" min="12" max="24" value="12" onchange="showFontValue(this.value)">
-					<span id="size">12</span>
-				</td>
-			</tr>
-			<!-- CYCLE TIME field -->
-	    	<tr>
-				<td class="left-col"><span class="label label-default">Cycle Time</span></td>
-	            <td class="right-col">
-					<input type="range" name="fontsize" min="1" max="30" value="1" onchange="showTimeValue(this.value)">
-					<span id="time">1</span> seconds
-				</td>
-			</tr>
-			
-	    </table>
-	</div> 
+    <table class="table">
+        <!-- ADD CONTACT field -->
+        <tr>
+            <td class="left-col"><span class="label label-default">Add Contact</span></td>
+            <td class="right-col">
+				<input type="text" id="nameBox" value="First Last" onblur="if (this.value == '') {this.value = 'First Last';}"
+ onfocus="if (this.value == 'First Last') {this.value = '';}"></input>
+
+				<input type="text" id="addressBox" value="<firstlast@example.com>" onblur="if (this.value == '') {this.value = '<firstlast@example.com>';}"
+ onfocus="if (this.value == '<firstlast@example.com>') {this.value = '';}"></input>
+
+				<div class="btn btn-primary btn-block" id="plus" onclick="addContact()"><span class="glyphicon glyphicon-plus"></span></div>
+
+				<div id="contact-notifiction"></div>
+			</td>
+        </tr>
+		<!-- FONT SIZE field -->
+    	<tr>
+			<td class="left-col"><span class="label label-default">Font Size</span></td>
+            <td class="right-col">
+				<input type="range" name="fontsize" min="12" max="24" value="12" onchange="showFontValue(this.value)">
+				<span id="size">12</span>
+			</td>
+		</tr>
+		<!-- CYCLE TIME field -->
+    	<tr>
+			<td class="left-col"><span class="label label-default">Cycle Time</span></td>
+            <td class="right-col">
+				<input type="range" name="fontsize" min="1" max="30" value="1" onchange="showTimeValue(this.value)">
+				<span id="time">1</span> seconds
+			</td>
+		</tr>
+    </table>
 </div> 
 
 </body>
