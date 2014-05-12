@@ -1,68 +1,119 @@
+var autosaveTimer = null;
 
 /* on load */
 $(window).load(function() {
-    // IF WRITING REPLY (or draft?? TODO)
-    console.log(meta('uid')+":"+meta('boxname'));
-	//if(meta('uid').length > 0) {
 
-    // IF WRITING REPLY
-	if(meta('boxname').length > 0) {
-         // loading screen
-        $('#loadingScreen').fadeIn(0);
+     // loading screen
+    $('#loadingScreen').fadeIn(0);
 
-		get_reply_data(function(subjText) {
-            var header;
-
-            // IS A DRAFT (new or existing)
-            if(!subjText  || document.referrer.indexOf("drafts") > -1) {
-                header = "Compose";
-            }
-            else {
-                // IS A REPLY
-    			if(subjText && subjText.length > 30) {
-    				subjText = subjText.substring(0, 30) + "...";
-    			}
-                else if (subjText === '') {
-                    // handle ('no subject')
-                }
-    			header = "Inbox > " +subjText + " > Reply";
-            }
-	        
-
-            $('#pathHeader').text(header);
+	get_message_data(function(data) {
+        // brand new draft
+        if(data.length < 1) {
+            // begin
+            $('#pathHeader').text('Compose');
             $('#loadingScreen').fadeOut(300);
-	        showHideScrollArrows();
-            // turn on cycling once everything has loaded
             cyclingOn(1);
-		});
-	}
-    // ELSE IF REGULAR COMPOSE
-	else {
+            return;
+        }
+
+
+        // is from draft box or not
+        var box = meta('boxname');
+        var fromDraftBox = false;
+        if(box.toLowerCase().indexOf('drafts') > -1) {
+            fromDraftBox = true;
+        }        
+
+        var toString = '';
+
+        var subjectString = (data[0].subject) ? data[0].subject : '';
+        var bodyText = '';
+        var header = '';
+
+        // from draft box
+        if(fromDraftBox) {
+            for(t in data[0].to) {
+                
+                var e = data[0].to[t].address;
+                //TODO dont add 'self' to list
+                toString += e+', ';
+            }
+            if(toString.length > 2) {
+                toString = toString.substring(0, toString.length-2);
+            }        
+            bodyText = data[0].text;
+            header = 'EDITING A DRAFT';
+        }
+        // reply (from inbox)
+        else {
+            // reply-all
+            var senderReplyingTo = data[0].from.address;
+            toString += senderReplyingTo+", ";
+            for(item in data[0].to) {
+                var n = data[0].to[item].name;
+                var e = data[0].to[item].address;
+                //TODO dont add 'self' to list
+                if(!(e==='speakyourmail@gmail.com') && !(e===senderReplyingTo)) {
+                    toString += n + " "+e;
+                    toString += ", ";
+                }
+            }
+            toString = toString.substring(0, toString.length-2);
+            subjectString = (subjectString.length>0) ? 'Re: ' + subjectString : '';
+            bodyText = jQuery('<div>').html(data[0].body).text();
+            bodyText = '\n\n\n-----\n'+bodyText;
+
+            // FILL HEADER 
+            var subjText = data[0].subject;
+
+            if(subjText && subjText.length > 30) {
+                subjText = subjText.substring(0, 30) + "...";
+            }
+            else if (subjText === '') {
+                // handle ('no subject')
+                subjText = '(no subject)';
+            }
+            header = "Inbox > " +subjText + " > Reply";
+        }
+
+
+        $("#toTextArea").val(toString);
+        $("#subjectText").val(subjectString);
+        $('#write').val(bodyText);
+        $('#write').selectRange(0);
+
+        $('#pathHeader').text(header);
+
+        // begin
+        $('#loadingScreen').fadeOut(300);
+        autosizeTextarea('toTextArea');
+        autosizeTextarea('subjectText');
+        showHideScrollArrows();
         cyclingOn(1);
-		$('#pathHeader').text('Compose');
-	}
+	});
+
 
     /* event handlers */
     $("#toTextArea").on('change keyup paste', function() {
-        var e = document.getElementById('toTextArea');
-        if(e.scrollHeight > e.clientHeight) {
-            $(this).height(e.scrollHeight+'px');
+        autosizeTextarea('toTextArea');
+        if(autosaveTimer === null) {
+            autosaveTimer = window.setTimeout(timeoutFunction, 3000);
         }
-        setTimeout(saveDraft(this), 3000); 
     });
 
     $("#subjectText").on('change keyup paste', function() {
-        var e = document.getElementById('subjectText');
-        if(e.scrollHeight > e.clientHeight) {
-            $(this).height(e.scrollHeight+'px');
+        autosizeTextarea('subjectText');
+        if(autosaveTimer === null) {
+            autosaveTimer = window.setTimeout(timeoutFunction, 3000);
         }
-        setTimeout(saveDraft(this),3000); 
     });
 
 
     $("#write").on('change keyup paste', function() {
         showHideScrollArrows();
-        setTimeout(saveDraft(this), 3000); 
+        if(autosaveTimer === null) {
+            autosaveTimer = window.setTimeout(timeoutFunction, 3000);
+        } 
     });
 
     $(window).bind('resize', function() {
@@ -71,36 +122,31 @@ $(window).load(function() {
 
 });
 
+function timeoutFunction() {
+    saveDraft(this);
+    autosaveTimer = null;
+}
+function autosizeTextarea(textAreaID) {
+    // timeout to wait for letter to print
+    setTimeout(function() {
+        var e = document.getElementById(textAreaID);
+        if(e.scrollHeight > e.clientHeight) {
+            var newHeight = e.scrollHeight + 10;
+            e.style.cssText = 'height:0; padding:0';
+            e.style.cssText = 'height:' + newHeight + 'px';
+        }
+    }, 0);
+}
 
 
-
-
-function get_reply_data(callback) {   
+function get_message_data(callback) {   
     make_request('/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
+        console.log('MADE REQUEST. '+this.status);
         if (this.status == 200) {    
 			var content = this.responseText;
 			var data = JSON.parse(content);
-
-            // nothing returned, meaning this is a brand new draft
-            if(data.length < 1) {
-                callback();
-                return;
-            }
-            // console.log(data.length);
-			$("#from").html();
-
-			$("#toTextArea").val(data[0].from.address);
-
-			$("#subjectText").val("Re: " + data[0].subject);
-
-   			$("#replyText").html(data[0].body);
-
-			var plainText = jQuery('<div>').html(data[0].body).text();
-
-			$('#write').val('\n\n\n-----\n'+plainText);
-			$('#write').selectRange(0);
-			callback(data[0].subject);
-        }
+            callback(data);
+         }
         else {
             alert("Feed Request was invalid.");
         }               
@@ -115,17 +161,16 @@ function submitEmail() {
 }
 
 function deleteMessage(inboxmsg) {
-
-    make_request('http://localhost:8080/delete/' + meta("uid"), function(e) {
+    make_request('/delete/' + meta("uid"), function(e) {
 
     }); 
-    window.location.href = 'http://localhost:8080/';
+    window.location.href = '/';
 }
 
 function saveDraft(msg){
 	var request = new XMLHttpRequest();
-
-    url = 'http://localhost:8080/save';
+    console.log("AUTOSAVING");
+    url = '/save';
     request.open('POST', url, true);
    	request.setRequestHeader('Content-Type', "application/json"); 
     var emailString = document.getElementById("toTextArea").value;
@@ -158,12 +203,10 @@ function sendMail(msg){
     var listToVerify = emailString.split(',');
     for(item in listToVerify) {
         if(!(validateEmail(listToVerify[item]))) {
-            console.log("INVALID EMAIL: "+listToVerify[item]);
+            console.log("INVALID EMAIL:"+listToVerify[item]);
             return;
         }
     }
-    //TODO CHECK, DONT SEND IF STRING IS EMPTY
-    console.log("SENDING TO "+emailString);
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
@@ -289,6 +332,7 @@ function toggleRecipient(obj) {
 
 	$('#toTextArea').val(emailString);
     $('#toTextArea').change();
+    autosizeTextarea('toTextArea');
 }
 
 function cycleRecipients(dir) {

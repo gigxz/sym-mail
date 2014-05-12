@@ -41,7 +41,7 @@ function deleteMessage(inboxmsg) {
 
 
 function get_message_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('boxname') + '/' + meta('uid'), function(e) {
+    make_request('/getemail/' + meta('boxname') + '/' + meta('uid'), function(e) {
         if (this.status == 200) {    
             var content = this.responseText;
             var data = JSON.parse(content);
@@ -51,13 +51,17 @@ function get_message_data(callback) {
             for(item in data[0].to) {
                 var n = data[0].to[item].name;
                 var e = data[0].to[item].address;
-                toString += n + " <"+e+">";
+                toString += n + " "+e;
                 toString += ", "
 
             }
             toString = toString.substring(0, toString.length-2);
             $('#to').text(toString);
-            $("#subject").text(data[0].subject);
+            var displaySubject = data[0].subject;
+            if(!(data[0].subject) || data[0].subject.length>0) {
+                displaySubject = '(no subject)';
+            }
+            $("#subject").text(displaySubject);
             $(".messageBody").html(data[0].body);
             callback();
         } else {

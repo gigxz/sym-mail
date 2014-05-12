@@ -5,7 +5,7 @@ function addContact() {
 
 	if(!(validateEmail(address))) {
 		$('#contact-notifiction').text(address+" is not a valid email address.");
-		$( "#contact-notifiction" ).fadeIn(400).delay(4000).fadeOut(400);
+		$("#contact-notifiction" ).fadeIn(400).delay(4000).fadeOut(400);
 	}
 	else {
 

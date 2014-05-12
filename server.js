@@ -341,7 +341,7 @@ function openEmailBox(box, cb) {
   try {
     imap.openBox(box, false, cb);
     imap.once('error', function(e){
-      console.log("open email box, line 257. " + e); 
+      console.log("open email box, line 344. " + e); 
     });
   }
   catch(err) {
@@ -416,7 +416,6 @@ app.get('/getemail/:boxname/:uid', function(request, response) {
             		mailparser.on('end', function(mail_object) {
           				text =  mail_object.html;
                   messages.unshift({ //insert first
-          // 					from: mail_object.from[0].name + ' ' + mail_object.from[0].address,
           					from: mail_object.from[0],
           					subject: mail_object.subject,
           					to: mail_object.to, // a list of 'to' objects (name and address)
