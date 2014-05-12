@@ -26,7 +26,7 @@ window.addEventListener('load', function(){
 
 /* GET DATA ON A SPECIFIC PAGE */
 function get_box_data_page(pgNum, callback) {
-    var box = 'http://localhost:8080/getemails/' + meta('boxname')+'/'+pgNum;
+    var box = '/getemails/' + meta('boxname')+'/'+pgNum;
     make_request(box, function() {
         if (this.status == 200) {       
             var content = this.responseText;
@@ -68,7 +68,7 @@ function scrollBox(dir) {
 }
 
 function readEmail(inboxmsg) {
-    window.location.href = 'http://localhost:8080/email/' + meta('boxname') + '/' + $(inboxmsg).attr('uid');
+    window.location.href = '/email/' + meta('boxname') + '/' + $(inboxmsg).attr('uid');
 }
 
 

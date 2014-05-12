@@ -191,7 +191,7 @@ var cycle = function () {
 
 
 function followLink(pageName) {
-    var url = 'http://localhost:8080/'+pageName;
+    var url = '/'+pageName;
     window.location.href = url;//+'?size='+fontSize;
 }
 

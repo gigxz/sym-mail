@@ -34,9 +34,9 @@ $(window).bind('resize', function() {
 });
 
 function deleteMessage(inboxmsg) {
-    make_request('http://localhost:8080/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
+    make_request('/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
     }); 
-    window.location.href = 'http://localhost:8080/';
+    window.location.href = '/';
 }
 
 

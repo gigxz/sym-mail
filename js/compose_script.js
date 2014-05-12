@@ -183,7 +183,6 @@ function saveDraft(msg){
     	"bodyText": document.getElementById("write").value, 
         "draft_id": meta("draft_id")
     }));
-    //window.location.href = "http://localhost:8080/inbox";
 }
 
 
@@ -212,7 +211,7 @@ function sendMail(msg){
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value
     }));
-    //window.location.href = "http://localhost:8080/inbox";
+    window.location.href = "/inbox";
 }
 
 
