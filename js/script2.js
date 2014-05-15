@@ -4,17 +4,39 @@ var groupNumber = 0,
     intervalFunction,    
     waitTime = 1000,
     fontSize,
-    cyclingActive = false;
+    cyclingActive = false,
+    selectionKeyCode = 32;
 
 /* sets up for cycling but does not start it */
 window.addEventListener('load', function(){
     $(window).focus();
-    //set font size TODO
-    fontSize = '16';
+    //set font size
+    fontSize = getCookie('fontsize');
+    if(fontSize===''){
+        fontSize='16'; //default
+    }
+
+    waitTime = getCookie('waittime');
+    console.log('WAIT TIME: '+waitTime);
+	if(waitTime===''){
+        	waitTime=1000; //default
+		console.log('WAITTIME SET TO 1000');
+	}
     document.body.style.setProperty('font-size', fontSize+'px', 'important' );
 
     addTransitions();
 }); 
+
+function getCookie(cname) {
+var name = cname + "=";
+var ca = document.cookie.split(';');
+for(var i=0; i<ca.length; i++) 
+  {
+  var c = ca[i].trim();
+  if (c.indexOf(name)==0) return c.substring(name.length,c.length);
+  }
+return "";
+}
 
 /* cyclingOn(1) to BEGIN, cyclingOn(0) to STOP */
 function cyclingOn(num) {
@@ -26,7 +48,12 @@ function cyclingOn(num) {
         clearInterval(intervalFunction);
         groupNumber = 0;
         id = 'group';
-        waitTime = 1000;
+
+    	waitTime = getCookie('waittime');    
+	if(waitTime===''){
+		waitTime = 1000; //default
+    	}
+
         intervalFunction = setInterval(cycle, waitTime);
         clickHandler(); 
     }
@@ -59,18 +86,23 @@ function showFontValue(newValue) {
 
 function setFontSize(val) {
     fontSize = val;
-	document.body.style.setProperty('font-size', fontSize+'px', 'important' );
+    document.body.style.setProperty('font-size', fontSize+'px', 'important' );
+    var currentdomain = document.domain;
+    document.cookie="fontsize="+val+"; path=/; domain="+currentdomain.replace("/templates", ";");
 }
 
 function setCycleTime(val) {
+	//console.log("setting cycle time var to "+val*1000);
 	waitTime = val*1000;
+	var currentdomain = document.domain;
+	document.cookie="waittime="+waitTime+"; path=/; domain="+currentdomain.replace("/templates", ";");
 }
 
 var clickHandler = function() {
         // prevent default behavior
         // (i.e. page scrolling down when you press space)
         $(document).keydown(function(e) {
-            if(e.keyCode === 32) {
+            if(e.keyCode === selectionKeyCode) {
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 e.preventDefault();
@@ -79,7 +111,7 @@ var clickHandler = function() {
         });
 
         $(document).keyup(function(e) {
-            if (e.keyCode === 32){
+            if (e.keyCode === selectionKeyCode){
                 e.stopImmediatePropagation();
                 e.stopPropagation();
                 e.preventDefault(); 
@@ -89,7 +121,6 @@ var clickHandler = function() {
 
                 clearInterval(intervalFunction);
                 if (stringGroup === '#goBack') {
-                    // ex. compose checks special things if goback is clicked
                     document.getElementById('goBack').click();
                     groupNumber = 0; 
                     id = id.slice(0, -6);
@@ -103,10 +134,12 @@ var clickHandler = function() {
                         expandKeyboard($('#'+id+groupNumber).find('textarea').attr('id'));
                     }
                     else {
-                        // if one level down exists AND is not hidden
+			// if the id+groupNumber has unhidden children, cycle through it
+			// special case for if it only has one 'child'
+			// if it has no children, click on it
                         var levelDownSelecter = '#'+id + groupNumber + 'group1';
                         hasUnhiddenChildren(id+groupNumber, function(numChildren, singleChildID) {
-                            if ($(levelDownSelecter).length && numChildren > 1){//!$(levelDownSelecter).hasClass('hide')) {
+                            if ($(levelDownSelecter).length && numChildren > 1){
                                 id = id + groupNumber + 'group'
                                 groupNumber = 0;
                             } 
@@ -119,25 +152,22 @@ var clickHandler = function() {
                                 if(elementExists(id+groupNumber)) {
                                     document.getElementById(id+groupNumber).click();
                                 }
-                                else {
-                                    console.log("WHAAaaaaaaAAAt");
-                                }
                             } 
-                        
                             intervalFunction = setInterval(cycle, waitTime); 
                         });
-    
                     }
                 }
            }
         });
 };
 
+/* check if a given groupid (ex. 'group1group2') has 
+and unhidden (i.e. without class 'hide') children. 
+A 'child' of 'group1group2' would be 'group1group2group1' etc.. */
 var hasUnhiddenChildren = function(groupid, callback) {
     var child_id_len = groupid.length + "group".length + 1;
     var numVisibleChildren = 0;
     var onlyChildID = null;
-
     $("[id^='"+groupid+"']").each(function(index, obj) {
         if($(this).attr('id').length === child_id_len) {
             if(!$(this).hasClass('hide')){
@@ -151,28 +181,13 @@ var hasUnhiddenChildren = function(groupid, callback) {
     });
 }
 
-
 var animate = function(stringGroup){
-	if(!cyclingActive)
+    if(!cyclingActive)
         return;
-    // $( stringGroup ).animate(
-    //     {fontSize: '120%', 
-    //      //backgroundColor: 'blue'
-    //     });
-    // setTimeout(function(){
-    //     $(stringGroup).animate({fontSize: '100%'})
-    // }, waitTime/2); y
-
-
-	$(stringGroup).addClass('boxed');
+    $(stringGroup).addClass('boxed');
     setTimeout(function(){
         $(stringGroup).removeClass('boxed');
     }, waitTime);
-	
-	// OPTION 3: changing background color
-	//$(stringGroup).effect('highlight', {color:'#7D7D7D', easing:'easeInExpo'}, waitTime);
-	 //TODO get rgb color and change it
-	
 };
 
 
@@ -191,7 +206,6 @@ var elementExists = function(idToCheck) {
 var cycle = function () {
     // the do-while loop skips over elements with class 'hide'
     var curr;
-
     do {
         groupNumber = groupNumber + 1; 
         curr = id + groupNumber; // temp element to check
@@ -209,8 +223,8 @@ var cycle = function () {
 
 
 function followLink(pageName) {
-    var url = 'http://localhost:8080/'+pageName;
-    window.location.href = url;//+'?size='+fontSize;
+    var url = window.location.protocol + "//" + window.location.host + "/"+pageName;
+    window.location.href = url;
 }
 
 function getQueryVariable(query, name) {
@@ -233,7 +247,6 @@ function scrollText(dir) {
     setTimeout(function() {
         clearInterval(i);
     }, dist);
-
 }
 
 function showHideScrollArrows() {
@@ -246,6 +259,10 @@ function showHideScrollArrows() {
     else {
         $('.arrows').addClass('hide');
     }
+}
+
+function mailboxes() {
+	alert('showing mailboxes!');
 }
 
 function make_request(url, callback) {
@@ -261,4 +278,10 @@ function meta(name) {
     if (tag != null)
         return tag.content;
     return '';
+}
+
+
+function validateEmail(email) { 
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
 }

@@ -13,7 +13,6 @@
 
     <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js"></script>
-    <script type="text/javascript" src="/js/jquery.autosize.js"></script>
     <script type="text/javascript" src="/js/compose_script.js"></script>
     <script type="text/javascript" src="/js/script2.js"></script>
 
@@ -25,11 +24,10 @@
 
 <div id="group">
 <div id="pathHeader"></div>
-
 <!--BUTTONS-->
 <div class="nav-buttons">
-    <div id="group1" class="white-border">
-		<div id="group1group1" type="button" class="btn btn-primary btn-block" onclick='followLink("inbox")'>Inbox</div>
+    <div id="group1" class="firstButtonGroup white-border">
+		<div id="group1group1" type="button" class="btn btn-primary btn-block" onclick='followLink("")'>Inbox</div>
 		<div id="group1group2" type="button" class="btn btn-primary btn-block" onclick='sendMail(this)'>Send</div>
 		<div id="group1group3" type="button" class="btn btn-primary btn-block" onclick='saveDraft(this)'>Save Draft</div>
         <div id="group1group4" type="button" class="btn btn-primary btn-block" onclick="deleteMessage(this)">Delete</div>
@@ -62,13 +60,16 @@
             <td class="left-col">
                 <span class="label label-default">To</span>
             </td>
-            <td class="middle-col">
-                <div id="group2group1group1" class="compose-table requiresKeyboard white-border">
+
+			<td class="right-col">
+
+                <div id="group2group1group1" class="requiresKeyboard white-border to-text-container">
                     <textarea class="textBox" id="toTextArea"></textarea>
                 </div>
-            </td>
-			<td class="right-col">
-				<div id="group2group1group2" type="button" class="btn btn-primary btn-block select" onclick="expandToSelection(0)">Select</div>
+
+				<div id="group2group1group2" type="button" class="btn btn-primary selectButton" onclick="expandToSelection(0)">
+                    Select
+                </div>
 			</td>
         </tr>
     </table>
@@ -87,34 +88,34 @@
         <tr>
             <td>
                 <div class="recipient-container hide" id="group2group1group2group2" onclick="toggleRecipient(this)">
-                    <div class="recipient btn btn-default hide">John Smith</div>
+                    <div class="recipient btn btn-default hide"></div>
                 </div>
-                <div class="email-address">johnny9878@gmail.com</div>
+                <div class="email-address"></div>
             </td>
         </tr>
 
         <tr>
             <td>
                 <div class="recipient-container hide"  id="group2group1group2group3" onclick="toggleRecipient(this)">
-                    <div class="recipient btn btn-default hide">Sally Fields</div>
+                    <div class="recipient btn btn-default hide"></div>
                 </div>
-                <div class="email-address">sally.fields@gmail.com</div>
+                <div class="email-address"></div>
             </td>
         </tr>
         
         <tr>
             <td>
                 <div class="recipient-container hide" id="group2group1group2group4" onclick="toggleRecipient(this)">
-                    <div class="recipient btn btn-default hide" >Joe Brown</div>
+                    <div class="recipient btn btn-default hide" ></div>
                 </div>
-                <div class="email-address">joe_brown@gmail.com</div>
+                <div class="email-address"></div>
             </td>
         </tr>
         
         <tr>
             <td>
                 <div class="recipient-container hide" id="group2group1group2group5" onclick="toggleRecipient(this)">
-                    <div class="recipient btn btn-default hide">owen_thomas@gmail.com</div>
+                    <div class="recipient btn btn-default hide"></div>
                 </div>
                 <div class="email-address"></div>
             </td>

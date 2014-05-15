@@ -1,95 +1,154 @@
-var recipients = [];
+var autosaveTimer = null;
 
 /* on load */
 $(window).load(function() {
-    // IF WRITING REPLY
-	if(meta('boxname').length > 0) {
-        // loading screen
-        $('#loadingScreen').fadeIn(0);
 
-		get_reply_data(function(subjText) {
-			if(subjText && subjText.length > 30) {
-				subjText = subjText.substring(0, 30 + "...");
-			}
-			var header = "Inbox > ";
-	        if(document.referrer.indexOf("drafts") > -1) {
-	            header = "Drafts > ";
-	        }
-	        if(subjText) {
-	            header += subjText;
-	        }
-	        else {
-	            header += "Read Message";
-	        }
-	        header += " > Reply";
-	        $('#pathHeader').text(header);
+    $('#loadingScreen').fadeIn(0);
+      // get message data for this page
+      get_message_data(function(data) {
 
+        // brand new draft
+        if(data.length < 1) {
+            $('#pathHeader').text('Compose');
             $('#loadingScreen').fadeOut(300);
-	        showHideScrollArrows();
-            // turn on cycling once everything has loaded
             cyclingOn(1);
-		});
-	}
-    // ELSE IF REGULAR COMPOSE
-	else {
+            return;
+        }
+
+        // is from draft box or not
+        var box = meta('boxname');
+        var fromDraftBox = false;
+        if(box.toLowerCase().indexOf('drafts') > -1) {
+            fromDraftBox = true;
+        }        
+
+        // fields to fill
+	var toString = '';
+        var subjectString = (data[0].subject) ? data[0].subject : '';
+        var bodyText = '';
+        var header = '';
+
+        // from draft box
+        if(fromDraftBox) {
+            for(t in data[0].to) {
+                var e = data[0].to[t].address;
+                toString += e+', ';
+            }
+            if(toString.length > 2) {
+                toString = toString.substring(0, toString.length-2);
+            }        
+            bodyText = data[0].text;
+            header = 'Compose';
+        }
+        // reply (from inbox)
+        else {
+            // reply-all
+            var senderReplyingTo = data[0].from.address;
+            toString += senderReplyingTo+", ";
+            for(item in data[0].to) {
+                var n = data[0].to[item].name;
+                var e = data[0].to[item].address;
+                if(!(e===senderReplyingTo)) {
+                    toString += n + " "+e;
+                    toString += ", ";
+                }
+            }
+            toString = toString.substring(0, toString.length-2);
+            subjectString = (subjectString.length>0) ? 'Re: ' + subjectString : '';
+            bodyText = jQuery('<div>').html(data[0].body).text();
+            bodyText = '\n\n\n-----\n'+bodyText;
+
+            // FILL HEADER 
+            var subjText = data[0].subject;
+            if(subjText && subjText.length > 30) {
+                subjText = subjText.substring(0, 30) + "...";
+            }
+            else if (subjText === '') {
+                subjText = '(no subject)';
+            }
+            header = "Inbox > " +subjText + " > Reply";
+        }
+
+        $("#toTextArea").val(toString);
+        $("#subjectText").val(subjectString);
+        $('#write').val(bodyText);
+        $('#write').selectRange(0);
+
+        $('#pathHeader').text(header);
+
+        // begin
+        $('#loadingScreen').fadeOut(300);
+        autosizeTextarea('toTextArea');
+        autosizeTextarea('subjectText');
+        showHideScrollArrows();
         cyclingOn(1);
-		$('#pathHeader').text('Compose');
-	}
+	});
+
+
+    /* event handlers */
+    $("#toTextArea").on('change keyup paste', function() {
+        autosizeTextarea('toTextArea');
+        if(autosaveTimer === null) {
+            autosaveTimer = window.setTimeout(timeoutFunction, 3000);
+        }
+    });
+
+    $("#subjectText").on('change keyup paste', function() {
+        autosizeTextarea('subjectText');
+        if(autosaveTimer === null) {
+            autosaveTimer = window.setTimeout(timeoutFunction, 3000);
+        }
+    });
 
 
     $("#write").on('change keyup paste', function() {
         showHideScrollArrows();
-        setTimeout(saveDraft(this), 3000); 
+        if(autosaveTimer === null) {
+            autosaveTimer = window.setTimeout(timeoutFunction, 3000);
+        } 
     });
 
-    $("#toTextArea").on('change keyup paste', function() {
-        $(this).height(this.scrollHeight);
-        setTimeout(saveDraft(this), 3000); 
-    });
-
-    $("#subjectText").on('change keyup paste', function() {
-        $(this).height(this.scrollHeight);
-        setTimeout(saveDraft(this),3000); 
+    $(window).bind('resize', function() {
+        showHideScrollArrows();
     });
 
 });
 
+/* timeout function to make sure that autosaving doesn't happen more often than every 3 secs */
+function timeoutFunction() {
+    saveDraft(this);
+    autosaveTimer = null;
+}
 
-
-
-
-function get_reply_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
-        if (this.status == 200) {    
-			var content = this.responseText;
-			var data = JSON.parse(content);
-
-			$("#from").html();
-
-			$("#toTextArea").html(data[0].from.address);
-
-			recipients.push(new Recipient(data[0].from.name, data[0].from.address));
-			$("#subjectText").html("Re: " + data[0].subject);
-
-   			$("#replyText").html(data[0].body);
-
-			var plainText = jQuery('<div>').html(data[0].body).text();
-
-			$('#write').val('\n\n\n-----\n'+plainText);
-			$('#write').selectRange(0);
-			callback(data[0].subject);
+function autosizeTextarea(textAreaID) {
+    // timeout to wait for letter to print
+    setTimeout(function() {
+        var e = document.getElementById(textAreaID);
+        if(e.scrollHeight > e.clientHeight) {
+            var newHeight = e.scrollHeight + 10;
+            e.style.cssText = 'height:0; padding:0';
+            e.style.cssText = 'height:' + newHeight + 'px';
         }
+    }, 0);
+}
+
+/* Get message data for (1) the messages you're reply to, or
+(2) the draft you want to edit */
+function get_message_data(callback) {   
+    make_request('/getemail/' + meta('boxname')+'/'+meta('uid'), function(e) {
+        console.log('MADE REQUEST. '+this.status);
+        if (this.status == 200) {    
+		var content = this.responseText;
+		var data = JSON.parse(content);
+            	callback(data);
+         }
         else {
-            alert("Feed Request was invalid.");
+            	alert("Feed Request was invalid.");
+		callback(null);
         }               
     });
 }
 
-
-// when window is resized, check again if you need arrows
-$(window).bind('resize', function() {
-    showHideScrollArrows();
-});
 
 
 function submitEmail() {
@@ -98,67 +157,68 @@ function submitEmail() {
 }
 
 function deleteMessage(inboxmsg) {
-    make_request('http://localhost:8080/delete/' + meta("uid"), function(e) {
+    make_request('/delete/' + meta("uid"), function(e) {
+
     }); 
-    window.location.href = 'http://localhost:8080/';
+    window.location.href = '/';
 }
 
 function saveDraft(msg){
-	var request = new XMLHttpRequest();
-    console.log("saving");
-    url = 'http://localhost:8080/save';
+    var request = new XMLHttpRequest();
+    console.log("AUTOSAVING");
+    url = '/save';
     request.open('POST', url, true);
-   	request.setRequestHeader('Content-Type', "application/json"); 
-   	var emailString = '';
-   	recipients.forEach(function(x){
-   		emailString += x.email + ','; 
-   	});
-   	emailString = emailString.slice(0,-1);
+    request.addEventListener("load", function(){
+	console.log(this); 
+	$('meta[name=draft_id]').attr('content', this.responseText);	
+    },false);
+    request.setRequestHeader('Content-Type', "application/json"); 
+    var emailString = document.getElementById("toTextArea").value;
+    emailString = emailString.replace(/\s+/g, '');
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value, 
         "draft_id": meta("draft_id")
     }));
-    window.location.href = "http://localhost:8080/inbox";
 }
 
 
 function sendMail(msg){
     var request = new XMLHttpRequest();
-    url = 'http://localhost:8080/sendmail';
+    url = window.location.protocol + '//' + window.location.host + '/sendmail';
     request.open('POST', url, true);
-   	request.setRequestHeader('Content-Type', "application/json"); 
-   	var emailString = '';
-   	recipients.forEach(function(x){
-   		emailString += x.email + ','; 
-   	});
-   	emailString = emailString.slice(0,-1);
+    request.setRequestHeader('Content-Type', "application/json"); 
+    var emailString = '';    
+    emailString = document.getElementById("toTextArea").value;
+    emailString = emailString.replace(/\s+/g, '');
+
+    //verify email addresses
+    var listToVerify = emailString.split(',');
+    for(item in listToVerify) {
+        if(!(validateEmail(listToVerify[item]))) {
+            console.log("INVALID EMAIL:"+listToVerify[item]);
+            alert("Message not sent. Invalid email: "+listToVerify[item]);
+	    return;
+        }
+    }
     request.send(JSON.stringify({
     	"toText": emailString,
     	"subjectText": document.getElementById("subjectText").value,
     	"bodyText": document.getElementById("write").value
     }));
-    window.location.href = "http://localhost:8080/inbox";
+    window.location.href = window.location.protocol + "//" + window.location.host;
 }
 
 
-/* recipients obj */
-function Recipient(nickname, email) {
-	this.nickname = nickname;
-	this.email = email;
-}
 var pageNumber;
 function expandToSelection(num){
-	pageNumber = num; //this is what page you are on
-
-
+    pageNumber = num; //this is what page you are on
     $('#recipientBoxRow').removeClass('hide');
     // remove hide from all descendants
     $('#recipientBoxRow').find('.hide').removeClass('hide');
-
-	var offset = 0 + parseInt(pageNumber);
-	url = 'http://localhost:8080/addressBook/' + offset; 
+    var offset = 0 + parseInt(pageNumber);
+    url = '/addressBook/' + offset; 
     make_request(url, function(e) {
     	var content = this.responseText; 
 		var abook = JSON.parse(content); 
@@ -178,17 +238,25 @@ function expandToSelection(num){
 			}
 
             // if in recipients list, make active
-            for(var k in recipients) {
-                if(recipients[k].email === abook[i]['email']) {
+            var emailString = '';    
+            emailString = document.getElementById("toTextArea").value;
+            emailString = emailString.replace(/\s+/g, '');
+            var emailList = emailString.split(',');
+            for(var k in emailList) {
+                if(emailList[k].toLowerCase() === abook[i]['email'].toLowerCase()) {
                     $(recipient[i]).addClass('active');
                 }
+                else {
+                    $(recipient[i]).removeClass('active');
+                }
             }
-		};
 
-		var emails = $( ".email-address" ); 
-		for (var i = 0; i < emails.length && i < abook.length; i++) {
- 			emails[i].innerHTML = abook[i]['email']; 
-		};
+	};
+
+	var emails = $( ".email-address" ); 
+	for (var i = 0; i < emails.length && i < abook.length; i++) {
+ 		emails[i].innerHTML = abook[i]['email']; 
+	};
     }); 
 
     
@@ -210,47 +278,51 @@ function goBackClicked() {
     }
 }
 
+// toggle recipient in selection
 function toggleRecipient(obj) {
 	var name = $(obj).text().trim();
 	var addr = $(obj).parent().find('.email-address').text();
+
 	// if no email address, name is email address
 	if(addr === "") {
 		addr = name;
 	}
-	var thisRecipient = new Recipient(name, addr);
+    var added = true;
 
-	//ALREADY IN LIST
 	if($(obj).find('.recipient').hasClass('active')) {
 		$(obj).find('.recipient').removeClass('active');
-		removeRecipient(thisRecipient.email);
+        added=false;
 	}
-	else { //NOT ALREADY IN LIST
+	else {
 		$(obj).find('.recipient').addClass('active');
-		recipients.push(thisRecipient);
 	}
 
 	// make recipients list into comma-separated string
-	var recipString = "";
-	for(var j = 0; j < recipients.length; j++) {
-		recipString += recipients[j].email;
-		if(j!=recipients.length-1) {
-			recipString += ", ";
-		}
-	}
-	$('#toTextArea').text(recipString);
-	//$('#toTextArea').change(); 
-}
+    var emailString = '';    
+    emailString = document.getElementById("toTextArea").value;
 
-function removeRecipient(email) {
-	var indexToRemove = -1;
-	for(var i in recipients) {
-		if(recipients[i].email === email) {
-			indexToRemove = i;
-		}
-	}
-	if(indexToRemove != -1) {
-		recipients.splice(indexToRemove, 1);
-	} 
+    if(added) {
+        // add email to the string
+        var start = (emailString==='') ? '' : ', ';
+        emailString+=start+addr;
+    }
+    else {
+        // remove email from the string
+        emailString = emailString.replace(/\s+/g, '');
+        var emailList = emailString.split(',');
+        var newEmailString = '';
+        for(var k in emailList) {
+            if(!(emailList[k].toLowerCase() === addr.toLowerCase())) {
+                newEmailString+=emailList[k]+', ';
+            }
+        }
+        emailString = newEmailString.substring(0, newEmailString.length-2);
+
+    }
+
+	$('#toTextArea').val(emailString);
+    $('#toTextArea').change();
+    autosizeTextarea('toTextArea');
 }
 
 function cycleRecipients(dir) {
@@ -283,9 +355,10 @@ function expandKeyboard(textAreaID){
         document.getElementById("keyboardFrame").contentWindow.focus();
     }
 }
-function hideKeyboard() {
 
+function hideKeyboard() {
     if (!$('#keyboardFrame').hasClass("hide")){
+
         $('.writeMessageDiv').removeClass('hide');
         $('.writeSubjectDiv').removeClass('hide');
 		$('.writeRecipientDiv').removeClass('hide');

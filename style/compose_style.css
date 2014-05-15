@@ -26,8 +26,7 @@ table.compose-table td {
 
 .left-col {
 	width:6em;
-}
-.right-col {
+
 }
 
 .style-border {
@@ -47,18 +46,27 @@ table.compose-table td {
 
 
 /* to-field textarea */
-#to {
-	width: 19em;
-	padding: 1px;
+#toTextArea {
+	padding: 2px;
+	min-height: 2em;
 }
-
-
-
+.to-text-container {
+	width: 70% !important;
+	float:left;
+}
+.selectButton {
+	width:26%;
+	margin-top:4px;
+	float:right;
+	vertical-align: middle;
+	border:2px solid white;
+}
 
 
 /* subject-field textarea */
 #subjectText {
-
+	padding: 2px;
+	min-height: 2em;
 }
 
 /* email body textarea */

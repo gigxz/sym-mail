@@ -8,8 +8,7 @@ var keyNumber = 0,
     caretPosition;
 
 window.addEventListener('load', function(){
-    //TODO set font size ( get it from meta tag )
-    fontSize='18'; //default
+    fontSize='18';
     addKeyStyles();
     restartKeyboard();
 }); 

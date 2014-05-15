@@ -2,15 +2,18 @@ var pageNumber,
     totalNumber,
     maxPages;
 
+/**
+on load -- load in data for first page of box 
+**/
 window.addEventListener('load', function(){
-    maxPages = 10; //TODO delete
+    maxPages = 1;
     $('#loadingScreen').fadeIn(0);
     cyclingOn(0); // stop cycling
     get_box_data_page(1, function(data) {
-        if(data) {
-            //totalNumber = data.total;
-            //maxPages = totalNumber/6;
-            replaceBoxMessages(data, function() {
+        if(data && data.length > 0) {
+        	totalNumber = data[0].size;
+        	maxPages = Math.ceil(totalNumber/6);
+        	replaceBoxMessages(data[1].messages, function() {
                 // everything loaded, start cycling
                 $('#loadingScreen').fadeOut(300);
                 cyclingOn(1); 
@@ -18,14 +21,17 @@ window.addEventListener('load', function(){
         }
         else {
             $('#loadingScreen').fadeOut(300);
+            console.log("NOTHING TO RETRIEVE");
         }
     });
 }, false);
 
 
-/* GET DATA ON A SPECIFIC PAGE */
+/* Get data of a specific page  */
 function get_box_data_page(pgNum, callback) {
-    var box = 'http://localhost:8080/getemails/' + meta('boxname')+'/'+pgNum;
+    var box = window.location.protocol + '//' + window.location.host + 
+    '/getemails/' + meta('boxname')+'/'+pgNum;
+
     make_request(box, function() {
         if (this.status == 200) {       
             var content = this.responseText;
@@ -39,47 +45,52 @@ function get_box_data_page(pgNum, callback) {
     });  
 }
 
+
 function setPageIndicator() {
     var string = 'page '+pageNumber+' of '+maxPages;
     $('#pageIndicator').text(string);
 }
 
+// dir is 1 for next page, -1 for previous page
 function scrollBox(dir) {
-    // page up
-    if(dir===1) {
-        cyclingOn(0); // stop cycling
-        get_box_data_page(pageNumber-1, function(data) {
-            //totalNumber = data.total;
-            //maxPages = totalNumber/6;
-            
-            replaceBoxMessages(data, function() {
+    var newPage = pageNumber + dir;
+    cyclingOn(0); // stop cycling
+    get_box_data_page(newPage, function(data) {
+        if(data && data.length > 0) {
+            totalNumber = data[0].size;
+            maxPages = Math.ceil(totalNumber/6);            
+            replaceBoxMessages(data[1].messages, function() {
                 cyclingOn(1); // everything loaded, start cycling
             });
-        });
-    }
-
-    // page down
-    else if(dir === -1) {
-        cyclingOn(0); // stop cycling
-        get_box_data_page(pageNumber+1, function(data) {
-            //totalNumber = data.total;
-            //maxPages = totalNumber/6;
-            replaceBoxMessages(data, function() {
-                cyclingOn(1); // everything loaded, start cycling
-            });
-        });
-    }
+        }
+        else {
+            console.log("ERROR retrieved no data for pg");
+            cyclingOn(1);
+        }
+    });
 }
 
 function readEmail(inboxmsg) {
-    window.location.href = 'http://localhost:8080/email/' + meta('boxname') + '/' + $(inboxmsg).attr('uid');
+    if(!($(inboxmsg).attr('uid')==='')) {
+        window.location.href = window.location.protocol + '//' + window.location.host
+	+'/email/' + meta('boxname') + '/' + $(inboxmsg).attr('uid');
+    }
 }
 
 
 /* given a list of 6 new messages, replace what's visible in the inbox */
 function replaceBoxMessages(newMessages, callback) {
-	//alert("Replace Inbox Messages");
+
     $('.inboxmsg').each(function(index, obj) {
+	if(typeof newMessages[index] === 'undefined') {
+		$(this).find('.sender').empty();
+		$(this).find('.subject').empty();
+		$(this).find('.timestamp').empty();
+		$(this).find('.message').empty();
+		$(this).attr('uid', '');
+	}
+	else {
+
         $(this).attr('uid', newMessages[index].uid);
         
         // replace sender
@@ -101,6 +112,7 @@ function replaceBoxMessages(newMessages, callback) {
         var htmlMSG = newMessages[index].message;
         $(this).find('.message').empty();
         $(this).find('.message').text($.trim(htmlMSG));
+	}
         callback();
     }).promise().done(function() {
         // reset page indicator and arrows
@@ -110,8 +122,9 @@ function replaceBoxMessages(newMessages, callback) {
     });
 }
 
-
-
+/* show and hide navigation arrows
+based on whether there are more avail
+messages up/down in the box */
 function showHideNavigationArrows() {
     if(pageNumber === 1) {
         // hide up arrow
@@ -137,9 +150,7 @@ function showHideNavigationArrows() {
     }
 }
 
-
-
-
+/* Formatting date */
 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
     'Oct', 'Nov', 'Dec'];
 function getFormattedDate(timestamp) {
@@ -196,4 +207,3 @@ Date.prototype.addHours = function(h) {
    this.setTime(this.getTime() + (h*60*60*1000)); 
    return this;   
 }
-

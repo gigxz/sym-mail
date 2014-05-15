@@ -1,6 +1,9 @@
 var subject = "";
 var sender = "";
 
+/* on load: get the email message to load,
+   set the page header,
+   and begin (hide loading screen, start cycling) */
 window.onload = function() {
     $('#loadingScreen').fadeIn(0);
     get_message_data(function() {
@@ -34,30 +37,33 @@ $(window).bind('resize', function() {
 });
 
 function deleteMessage(inboxmsg) {
-    make_request('http://localhost:8080/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
+    make_request('/delete/' + meta('boxname') +'/' +meta('uid'), function(e) {
     }); 
-    window.location.href = 'http://localhost:8080/';
+    window.location.href = '/';
 }
 
 
 function get_message_data(callback) {   
-    make_request('http://localhost:8080/getemail/' + meta('boxname') + '/' + meta('uid'), function(e) {
+    make_request(window.location.protocol + '//' + window.location.host +'/getemail/' + meta('boxname') + '/' + meta('uid'), function(e) {
         if (this.status == 200) {    
             var content = this.responseText;
             var data = JSON.parse(content);
             $("#from").text(data[0].from.address);
-
             var toString = '';
             for(item in data[0].to) {
                 var n = data[0].to[item].name;
                 var e = data[0].to[item].address;
-                toString += n + " <"+e+">";
+                toString += n + " "+e;
                 toString += ", "
 
             }
             toString = toString.substring(0, toString.length-2);
             $('#to').text(toString);
-            $("#subject").text(data[0].subject);
+            var displaySubject = data[0].subject;
+            if(!(data[0].subject) || data[0].subject.length>0) {
+                displaySubject = '(no subject)';
+            }
+            $("#subject").text(displaySubject);
             $(".messageBody").html(data[0].body);
             callback();
         } else {
@@ -69,5 +75,9 @@ function get_message_data(callback) {
 
 
 function reply() {
-    window.location.href = '/compose/'+meta('boxname')+'/'+meta('uid');
+    window.location.href = window.location.protocol + '//' + window.location.host + 
+	'/compose/'+meta('boxname')+'/'+meta('uid');
 }
+
+
+
